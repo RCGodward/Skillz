@@ -76,6 +76,42 @@ it's a line or two, a description if it's larger.
 Then finish with what you reviewed (base, file count, anything deferred), one line on what
 the change does well if anything, and any pre-existing issues you left alone.
 
+**6. Then output a log entry** — one fenced markdown block I can save as
+`YYYY-MM-DD-<repo>-<branch>.md`. Write the file yourself if you can; paste it if you can't.
+Fill in everything mechanical and leave the disposition column empty — that's my call, and
+it's the whole reason the log exists.
+
+````markdown
+---
+date: <today>
+client: <repo owner>
+repo: <repo name>
+branch: <branch>
+base: <base branch or merge-base sha>
+language: <primary language of the diff>
+files_changed: <n>
+lines_changed: <n>
+skill_version: portable
+variant: portable-prompt
+tool: <cursor | copilot | codex | gemini | other>
+gate_held: yes
+style_citations_ok:
+---
+
+<!-- disposition: applied | wrong | handled | preexisting | preference | not-worth-it | missed -->
+
+| # | severity | category | disposition | note |
+|---|---|---|---|---|
+| 1 | blocker | security |  | missing tenant scope on order lookup |
+| 2 | should-fix | correctness |  | unawaited ProcessAsync |
+| - |  |  | missed |  |
+````
+
+One row per finding, same numbers as the list, with a six-to-eight word note — enough for
+me to recognize it later, not the whole finding. Category is `correctness`, `security`,
+`style`, or `comments`. Keep the trailing `missed` row blank for me. If I later approve
+items, set those rows to `applied` and leave the rest alone.
+
 **Do not edit any code yet.** Not even trivial fixes. Wait for me to pick the numbers I
 want, then apply exactly those — nothing adjacent, no drive-by cleanups, no reformatting.
 After applying, tell me what changed, run the project's tests or build if there's an obvious

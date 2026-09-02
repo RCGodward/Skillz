@@ -16,18 +16,23 @@ style_citations_ok: yes | no | n/a
 
 ## Findings
 
-One row per finding the review produced. Add `missed` rows (number `-`) for
-anything you or a human reviewer caught that it didn't.
+The skill writes this file for you — see `<log>` in `branch-review/SKILL.md`. Use this
+template only when logging by hand (the portable prompt, or another tool). Either way the
+format has to stay parseable by `tally.sh`.
+
+One row per finding, in the order presented. A `missed` row (number `-`) records anything
+you or a human reviewer caught that the review didn't; it needs a note to count.
 
 Severity: `blocker` | `should-fix` | `optional`
 Category: `correctness` | `security` | `style` | `comments`
-Disposition: `applied` | `wrong` | `handled` | `preexisting` | `preference` | `not-worth-it` | `missed`
+
+<!-- disposition: applied | wrong | handled | preexisting | preference | not-worth-it | missed -->
 
 | # | severity | category | disposition | note |
 |---|---|---|---|---|
 | 1 |  |  |  |  |
 | 2 |  |  |  |  |
-| - | | | missed | |
+| - |  |  | missed |  |
 
 ## Gate
 

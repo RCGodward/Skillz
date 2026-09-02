@@ -22,13 +22,20 @@ echo "Reviews logged: ${#entries[@]}"
 echo
 
 awk -F'|' '
+  # the legend comment is pipe-separated too — never count it as a row
+  /^[[:space:]]*<!--/ { next }
+
   # table rows look like: | 3 | should-fix | style | preference | note |
   NF >= 6 {
-    sev = $3; cat = $4; disp = $5
+    sev = $3; cat = $4; disp = $5; note = $6
     gsub(/^[ \t]+|[ \t]+$/, "", sev)
     gsub(/^[ \t]+|[ \t]+$/, "", cat)
     gsub(/^[ \t]+|[ \t]+$/, "", disp)
+    gsub(/^[ \t]+|[ \t]+$/, "", note)
+    if (disp == "" && $2 ~ /[0-9]/) { uncoded++; next }
     if (disp !~ /^(applied|wrong|handled|preexisting|preference|not-worth-it|missed)$/) next
+    # an unfilled placeholder missed row carries no note — it is not a finding
+    if (disp == "missed" && note == "") next
     total++
     by_disp[disp]++
     if (cat != "") by_cat[cat]++
@@ -48,6 +55,7 @@ awk -F'|' '
       printf "%-14s %6d %6.0f%%\n", d, c, (c * 100.0) / total
     }
     printf "%-14s %6d\n", "TOTAL", total
+    if (uncoded > 0) printf "\n  (%d finding row%s still uncoded — not counted above)\n", uncoded, (uncoded == 1 ? "" : "s")
 
     print ""
     printf "%-13s %8s %8s %9s %11s %11s %13s %7s\n", "CATEGORY", "applied", "wrong", "handled", "preexist", "preference", "not-worth-it", "missed"

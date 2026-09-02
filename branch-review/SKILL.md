@@ -10,6 +10,8 @@ allowed-tools:
   - Edit
 ---
 
+<!-- branch-review v2 -->
+
 <objective>
 Review the changes on this branch against **the standards of the codebase they were added to**,
 not against any external style guide. Produce a numbered, reviewable list of proposed
@@ -176,6 +178,7 @@ This is the point of the skill. No Edit, no Write, no `sed -i`, no "I went ahead
 the trivial ones." Even a one-character fix waits.
 
 End with: *"Reply with the numbers to apply (or 'all'), and I'll make just those changes."*
+Then the one-line note about where the log entry landed (see `<log>`).
 
 When the user replies:
 - Apply exactly the approved items — nothing adjacent, no drive-by cleanups, no reformatting.
@@ -188,6 +191,62 @@ When the user replies:
 `--fix` in the arguments means the user pre-approved Blocker and Should-fix items: still
 present the list first, then apply those, and leave Optional items for them to choose.
 </approval_gate>
+
+<log>
+After presenting the findings — and before you stop — write an evaluation log entry.
+It exists so the user can score the review later without reconstructing it from memory.
+
+Write it with a Bash heredoc, not the Write tool. This skill is deliberately not granted
+`Write`, so that the approval gate can't be breached through it. That constraint holds here too.
+
+Destination: `${BRANCH_REVIEW_LOG_DIR:-$HOME/.branch-review-log}/`, created if absent.
+Filename: `YYYY-MM-DD-<repo>-<branch>.md`, with a `-2`, `-3` suffix if that name is taken.
+Never write the log into the repo under review — it isn't yours to add files to.
+
+Fill in everything mechanical. Leave every judgment call blank: the disposition column is
+the whole point of the log, and it's the user's to make, not yours.
+
+```markdown
+---
+date: <today>
+client: <repo owner, as a starting point — the user may recode it>
+repo: <repo name>
+branch: <branch reviewed>
+base: <base branch or merge-base sha>
+language: <primary language of the diff>
+files_changed: <n>
+lines_changed: <n>
+skill_version: <the vN from the marker at the top of this SKILL.md>
+variant: skill
+tool: claude-code
+gate_held: yes
+style_citations_ok:
+---
+
+<!-- disposition: applied | wrong | handled | preexisting | preference | not-worth-it | missed -->
+
+| # | severity | category | disposition | note |
+|---|---|---|---|---|
+| 1 | blocker | security |  | missing tenant scope on order lookup |
+| 2 | should-fix | correctness |  | unawaited ProcessAsync |
+| - |  |  | missed |  |
+```
+
+- One row per finding, in the order you presented them, with the same numbers.
+- `note` is a short label — six or eight words, enough to recognize the finding later.
+  Not the full finding; the user has that in the transcript.
+- Keep the trailing `missed` row blank for the user to fill in with anything you didn't catch.
+- `gate_held: yes` is true at the moment you write the file. If you later edit anything
+  that wasn't approved, come back and change it to `no`. Do not quietly leave it at `yes`.
+- Leave `style_citations_ok` empty. Whether a citation actually supports the finding is the
+  user's call, and self-grading it is worthless.
+
+Then tell the user where it landed, in one line, after the approval prompt.
+
+**After the apply step**, go back and set `disposition: applied` on the rows the user
+approved. Leave every other row blank — you know what they declined, not why, and the
+reason is the part worth recording.
+</log>
 
 <notes>
 - Client codebases differ hard. When this repo's convention conflicts with your instinct,

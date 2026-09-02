@@ -5,8 +5,22 @@ harness is for when you want ground truth or are testing a change to the skill.
 
 ## 1. Disposition log — from real use
 
-After a review you actually ran on client work, copy `log/TEMPLATE.md` to
-`log/YYYY-MM-DD-<client>-<branch>.md` and fill in one row per finding. Two minutes.
+The skill writes the entry itself. When it reports findings it drops a pre-filled log to
+`~/.branch-review-log/` (override with `BRANCH_REVIEW_LOG_DIR`) — metadata, one row per
+finding, and `applied` already set on whatever you approved. It never writes into the
+client repo.
+
+Pull the entries over when you're back here:
+
+```sh
+./collect.sh --list   # what's waiting, and how many rows are still uncoded
+./collect.sh          # move them into log/
+```
+
+Then fill in the disposition column. That's the part no tool can do for you, and it's
+the only part that matters. One minute per review.
+
+`log/TEMPLATE.md` is the manual fallback for the portable prompt or another tool.
 
 The point is not the count of findings, it's **why you rejected the ones you rejected**.
 That column is the improvement backlog, ranked by frequency.

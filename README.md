@@ -33,8 +33,8 @@ Then invoke it as `/branch-review`, optionally with a base branch, PR number, or
 
 ## Evaluating and improving a skill
 
-[`eval/`](eval/) holds two loops: a disposition log for reviews you run on real
-client work (`eval/log/`, tallied with `eval/tally.sh`), and a replay harness
+[`eval/`](eval/) holds two loops: a disposition log the skill writes for you after
+every review (`eval/collect.sh` files them, `eval/tally.sh` counts them), and a replay harness
 (`eval/replay.sh`) that pulls merged PRs from a repo and sets each one up beside
 the human review that already happened, so you can score findings against ground
 truth.
