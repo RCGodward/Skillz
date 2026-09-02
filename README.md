@@ -31,6 +31,16 @@ Then invoke it as `/branch-review`, optionally with a base branch, PR number, or
 /branch-review src/Billing --fix
 ```
 
+## Evaluating and improving a skill
+
+[`eval/`](eval/) holds two loops: a disposition log for reviews you run on real
+client work (`eval/log/`, tallied with `eval/tally.sh`), and a replay harness
+(`eval/replay.sh`) that pulls merged PRs from a repo and sets each one up beside
+the human review that already happened, so you can score findings against ground
+truth.
+
+See [eval/README.md](eval/README.md).
+
 ## Other AI tools
 
 Each skill that has one ships a `REVIEW-PROMPT.md`-style portable version — a
