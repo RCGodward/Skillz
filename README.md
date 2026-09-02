@@ -14,6 +14,12 @@ Portable Claude Code skills, kept here and copied into client repos as needed.
 ./install.sh branch-review /path/to/client-repo
 ```
 
+On Windows, `install.bat` does the same from cmd.exe or PowerShell:
+
+```bat
+install.bat branch-review C:\path\to\client-repo
+```
+
 That copies the skill to `<client-repo>/.claude/skills/branch-review/`. Use
 `--user` to install to `~/.claude/skills/` instead when you don't want a footprint
 in the client's tree:
@@ -49,7 +55,8 @@ yet. `install.sh` strips `evals/` when installing into a client repo.
 
 ## Windows
 
-The scripts are bash — run them from Git Bash or WSL, not PowerShell or cmd.
+`install.bat` is the installer for cmd.exe and PowerShell. The **eval** scripts
+(`eval/*.sh`) are bash — run those from Git Bash or WSL, not PowerShell or cmd.
 `.gitattributes` forces LF on `*.sh` so a Windows clone doesn't break the shebang.
 `gh` and `git` are the only dependencies. The skill itself is prose and works
 wherever Claude Code does; only the eval tooling is shell.
