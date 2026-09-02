@@ -1,0 +1,5 @@
+# Shell scripts must keep LF even on a Windows checkout — CRLF breaks the shebang
+# ("bad interpreter: /usr/bin/env^M") in Git Bash and WSL.
+* text=auto eol=lf
+*.sh text eol=lf
+*.md text eol=lf

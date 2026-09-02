@@ -45,7 +45,7 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-for dep in gh git jq; do
+for dep in gh git; do
   command -v "$dep" >/dev/null || { echo "$dep is required" >&2; exit 1; }
 done
 
@@ -87,14 +87,17 @@ echo
 
 for n in $pr_numbers; do
   dir="$out/pr-$n"
-  wt="$dir/worktree"
+  wt="$dir/wt"
   mkdir -p "$dir"
   echo "── PR #$n"
 
-  meta="$(cd "$repo_path" && gh pr view "$n" --json number,title,url,author,baseRefName,headRefName,baseRefOid,mergedAt,additions,deletions,changedFiles)"
-  echo "$meta" > "$dir/pr.json"
-  base_branch="$(echo "$meta" | jq -r .baseRefName)"
-  title="$(echo "$meta" | jq -r .title)"
+  fields=number,title,url,author,baseRefName,headRefName,baseRefOid,mergedAt,additions,deletions,changedFiles
+  (cd "$repo_path" && gh pr view "$n" --json "$fields") > "$dir/pr.json"
+
+  # gh's built-in --jq keeps this working without a standalone jq on PATH (Windows).
+  meta_tsv="$(cd "$repo_path" && gh pr view "$n" --json "$fields" \
+    -q '[.baseRefName, .url, (.changedFiles|tostring), (.additions|tostring), (.deletions|tostring), .title] | @tsv')"
+  IFS=$'\t' read -r base_branch pr_url pr_files pr_add pr_del title <<< "$meta_tsv"
 
   # refs/pull/N/head survives branch deletion, unlike the head branch itself.
   git -C "$repo_path" fetch -q origin "refs/pull/$n/head:refs/branch-review-replay/$n" --force
@@ -136,12 +139,12 @@ for n in $pr_numbers; do
 # Replay: $slug #$n
 
 $title
-$(echo "$meta" | jq -r .url)
+$pr_url
 
 - base branch: \`$base_branch\`
 - merge-base:  \`$base_sha\`
 - PR head:     \`$head_sha\`
-- size:        $(echo "$meta" | jq -r '"\(.changedFiles) files, +\(.additions)/-\(.deletions)"')
+- size:        $pr_files files, +$pr_add/-$pr_del
 - human inline comments: $comment_count
 
 ## Run the review

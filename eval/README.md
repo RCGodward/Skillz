@@ -73,6 +73,9 @@ examples from that repo.
 
 `--clean` removes the worktrees it created in the target repo when you're done.
 
+Needs `gh` and `git` only — JSON is parsed with gh's built-in `--jq`, so a standalone
+`jq` isn't required (it isn't on most Windows boxes).
+
 ### Testing a change to the skill
 
 Change **one section**, re-run the same PR set, diff the findings. Otherwise you

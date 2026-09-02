@@ -41,6 +41,13 @@ truth.
 
 See [eval/README.md](eval/README.md).
 
+## Windows
+
+The scripts are bash — run them from Git Bash or WSL, not PowerShell or cmd.
+`.gitattributes` forces LF on `*.sh` so a Windows clone doesn't break the shebang.
+`gh` and `git` are the only dependencies. The skill itself is prose and works
+wherever Claude Code does; only the eval tooling is shell.
+
 ## Other AI tools
 
 Each skill that has one ships a `REVIEW-PROMPT.md`-style portable version — a
