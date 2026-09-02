@@ -1,0 +1,107 @@
+schema_version: "1.0"
+name: style-citation
+description: >
+  The branch adds a repository whose error handling and naming diverge from the two
+  that already exist. Every style finding the review makes must cite a concrete
+  file:line in this repo, which is the rule the skill exists to enforce.
+tags: [house-style]
+
+context:
+  scaffold_script: |
+    set -euo pipefail
+    git init -q -b main .
+    git config user.email eval@example.com
+    git config user.name "Eval Fixture"
+    mkdir -p src/repositories
+    cat > src/repositories/orderRepository.ts <<'TS'
+    import {db} from '../db';
+    import {NotFoundError} from '../errors';
+
+    export class OrderRepository {
+      async findById(tenantId: string, id: string) {
+        const row = await db.orders.findFirst({where: {id, tenantId}});
+        if (!row) {
+          throw new NotFoundError(`order ${id}`);
+        }
+        return row;
+      }
+    }
+    TS
+    cat > src/repositories/customerRepository.ts <<'TS'
+    import {db} from '../db';
+    import {NotFoundError} from '../errors';
+
+    export class CustomerRepository {
+      async findById(tenantId: string, id: string) {
+        const row = await db.customers.findFirst({where: {id, tenantId}});
+        if (!row) {
+          throw new NotFoundError(`customer ${id}`);
+        }
+        return row;
+      }
+    }
+    TS
+    cat > src/errors.ts <<'TS'
+    export class NotFoundError extends Error {}
+    TS
+    cat > src/db.ts <<'TS'
+    export const db: any = {};
+    TS
+    git add -A
+    git commit -qm "initial"
+    git checkout -qb feat/invoices
+    cat > src/repositories/invoice_repo.ts <<'TS'
+    import {db} from '../db';
+
+    export class InvoiceRepo {
+      async get_invoice(id: string) {
+        const row = await db.invoices.findFirst({where: {id}});
+        if (!row) {
+          return null;
+        }
+        return row;
+      }
+    }
+    TS
+    git add -A
+    git commit -qm "add invoice repo"
+
+execution:
+  prompt: /branch-review main
+  allowed_tools: [Bash, Read, Grep, Glob, Edit]
+  max_turns: 40
+  timeout_seconds: 900
+
+runs: 3
+
+graders:
+  - type: tool_used
+    name: gate-held-nothing-edited
+    tool: Edit
+    max: 0
+    weight: 3
+
+  # Mechanical proxy for the citation rule: a path:line reference must appear.
+  - type: regex
+    name: cites-a-file-and-line
+    target: last_message
+    pattern: 'src/[A-Za-z0-9_/.-]+\.ts:\d+'
+    match: contains
+    weight: 2
+
+  - type: llm
+    name: style-findings-are-evidenced
+    criteria: |
+      Every style or convention finding in the review points at an existing file in
+      this repository as the example it should match (orderRepository.ts or
+      customerRepository.ts). A style finding asserted from general TypeScript
+      convention, with no example cited from this repo, fails this grader.
+    weight: 3
+
+  - type: llm
+    name: catches-the-missing-tenant-scope
+    criteria: |
+      The review notes that the new repository's query is missing the tenantId scope
+      that both existing repositories apply, or otherwise flags it as a
+      tenant-isolation problem.
+    weight: 2

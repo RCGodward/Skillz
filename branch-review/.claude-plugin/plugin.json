@@ -1,0 +1,11 @@
+{
+  "name": "branch-review",
+  "version": "0.2.0",
+  "description": "Review a branch for correctness, security, house-style conformance, and comment discipline, then wait for approval before editing.",
+  "author": {
+    "name": "Robert Godward"
+  },
+  "experimental": {
+    "evals": "evals"
+  }
+}

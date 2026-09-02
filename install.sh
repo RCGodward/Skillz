@@ -26,4 +26,6 @@ fi
 mkdir -p "$(dirname "$dest")"
 rm -rf "$dest"
 cp -R "$src_root/$skill" "$dest"
+# Eval fixtures are for developing the skill, not for the repo it gets installed into.
+rm -rf "$dest/evals"
 echo "installed $skill -> $dest"

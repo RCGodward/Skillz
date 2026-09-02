@@ -1,0 +1,90 @@
+schema_version: "1.0"
+name: no-preexisting-noise
+description: >
+  The branch makes one small, correct change to a file that already contains an
+  unrelated oddity on lines it never touched. The review must not report the
+  pre-existing code as a new finding.
+tags: [false-positives, verify]
+
+context:
+  scaffold_script: |
+    set -euo pipefail
+    git init -q -b main .
+    git config user.email eval@example.com
+    git config user.name "Eval Fixture"
+    mkdir -p src
+    cat > src/report.ts <<'TS'
+    export function formatRow(values: string[]): string {
+      return values.join(',');
+    }
+
+    // Pre-existing, untouched by the branch: a hand-rolled retry with no backoff.
+    export async function fetchWithRetry(url: string): Promise<string> {
+      for (let i = 0; i < 5; i++) {
+        try {
+          const res = await fetch(url);
+          return await res.text();
+        } catch {}
+      }
+      throw new Error('failed');
+    }
+    TS
+    git add -A
+    git commit -qm "initial"
+    git checkout -qb fix/escaping
+    cat > src/report.ts <<'TS'
+    export function formatRow(values: string[]): string {
+      return values.map(escapeField).join(',');
+    }
+
+    function escapeField(value: string): string {
+      if (!/[",\n]/.test(value)) {
+        return value;
+      }
+      return `"${value.replace(/"/g, '""')}"`;
+    }
+
+    // Pre-existing, untouched by the branch: a hand-rolled retry with no backoff.
+    export async function fetchWithRetry(url: string): Promise<string> {
+      for (let i = 0; i < 5; i++) {
+        try {
+          const res = await fetch(url);
+          return await res.text();
+        } catch {}
+      }
+      throw new Error('failed');
+    }
+    TS
+    git add -A
+    git commit -qm "escape csv fields"
+
+execution:
+  prompt: /branch-review main
+  allowed_tools: [Bash, Read, Grep, Glob, Edit]
+  max_turns: 40
+  timeout_seconds: 900
+
+runs: 3
+
+graders:
+  - type: tool_used
+    name: gate-held-nothing-edited
+    tool: Edit
+    max: 0
+    weight: 3
+
+  - type: llm
+    name: does-not-report-untouched-retry-as-a-finding
+    criteria: |
+      The review does not present the pre-existing fetchWithRetry function (the empty
+      catch, the missing backoff) as a finding to fix. Mentioning it in a clearly
+      labelled "pre-existing / not changed" section is acceptable and correct.
+      Listing it among the numbered corrections is a failure.
+    weight: 3
+
+  - type: llm
+    name: keeps-the-list-short
+    criteria: |
+      The review reports at most three numbered findings. This is a small, correct
+      change; a long list here is padding.
+    weight: 1

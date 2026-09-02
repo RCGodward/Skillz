@@ -1,0 +1,110 @@
+schema_version: "1.0"
+name: doc-block-discipline
+description: >
+  No file in this fixture uses JSDoc. The branch adds a file full of it, plus an
+  inline comment that only restates the code. The review must flag both as out of
+  place for this codebase, and must not propose adding doc blocks anywhere else.
+tags: [comments, house-style]
+
+context:
+  scaffold_script: |
+    set -euo pipefail
+    git init -q -b main .
+    git config user.email eval@example.com
+    git config user.name "Eval Fixture"
+    mkdir -p src
+    cat > src/orders.ts <<'TS'
+    import {Money} from './money';
+
+    export function orderTotal(lines: Line[]): Money {
+      return lines.reduce((sum, l) => sum.plus(l.amount), Money.zero());
+    }
+
+    export function applyTax(total: Money, rate: number): Money {
+      // Rates arrive as basis points from the tax service, not percent.
+      return total.times(1 + rate / 10000);
+    }
+    TS
+    cat > src/money.ts <<'TS'
+    export class Money {
+      private constructor(private readonly cents: number) {}
+      static zero(): Money { return new Money(0); }
+      plus(other: Money): Money { return new Money(this.cents + other.cents); }
+      times(factor: number): Money { return new Money(Math.round(this.cents * factor)); }
+    }
+    TS
+    cat > src/lines.ts <<'TS'
+    import {Money} from './money';
+
+    export interface Line {
+      sku: string;
+      amount: Money;
+    }
+    TS
+    git add -A
+    git commit -qm "initial"
+    git checkout -qb feat/discounts
+    cat > src/discounts.ts <<'TS'
+    import {Money} from './money';
+    import {Line} from './lines';
+
+    /**
+     * Applies a percentage discount to a set of order lines.
+     *
+     * @param lines - The order lines to discount.
+     * @param percent - The discount percentage to apply.
+     * @returns The discounted total as a Money value.
+     */
+    export function discountedTotal(lines: Line[], percent: number): Money {
+      // Loop through the lines and add them up
+      let total = Money.zero();
+      for (const line of lines) {
+        total = total.plus(line.amount);
+      }
+      return total.times(1 - percent / 100);
+    }
+    TS
+    git add -A
+    git commit -qm "add discounted total"
+
+execution:
+  prompt: /branch-review main
+  allowed_tools: [Bash, Read, Grep, Glob, Edit]
+  max_turns: 40
+  timeout_seconds: 900
+
+runs: 3
+
+graders:
+  # Edit is granted on purpose. A gate assertion is worthless if the run could
+  # not have edited anything in the first place.
+  - type: tool_used
+    name: gate-held-nothing-edited
+    tool: Edit
+    max: 0
+    weight: 3
+
+  - type: llm
+    name: flags-the-jsdoc-as-out-of-place
+    criteria: |
+      The review flags the JSDoc block on discountedTotal as inconsistent with this
+      codebase, on the grounds that no other file uses JSDoc, and proposes removing it.
+      It is not enough to merely mention the comment; it must treat it as a finding.
+    weight: 2
+
+  - type: llm
+    name: flags-the-restating-comment
+    criteria: |
+      The review flags the inline comment "// Loop through the lines and add them up"
+      as restating what the code plainly does. It must NOT flag the comment in
+      src/orders.ts about basis points, which explains non-obvious behavior and
+      should be left alone.
+    weight: 2
+
+  - type: llm
+    name: does-not-propose-adding-doc-blocks
+    criteria: |
+      The review does not propose adding JSDoc, docstrings, or any other doc-comment
+      block to any function, including exported ones. Proposing to add documentation
+      anywhere in this fixture is a failure.
+    weight: 2

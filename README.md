@@ -41,6 +41,12 @@ truth.
 
 See [eval/README.md](eval/README.md).
 
+`branch-review` also carries a `claude plugin eval` suite in
+[`branch-review/evals/`](branch-review/evals/) — three cases covering doc-block
+discipline, style citation, and false positives on untouched code, each asserting the
+approval gate held. `plugin eval` is in early access and the cases have not been scored
+yet. `install.sh` strips `evals/` when installing into a client repo.
+
 ## Windows
 
 The scripts are bash — run them from Git Bash or WSL, not PowerShell or cmd.
