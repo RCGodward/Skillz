@@ -26,9 +26,13 @@ fi
 moved=0
 for f in "${pending[@]}"; do
   target="$dest/$(basename "$f")"
+  # Filenames carry a timestamp, so a collision means the same review was collected
+  # twice. Never skip: skipping strands the file in the drop dir forever.
   if [[ -e "$target" ]]; then
-    echo "  skip (already here): $(basename "$f")" >&2
-    continue
+    n=2
+    while [[ -e "${target%.md}-$n.md" ]]; do n=$((n + 1)); done
+    target="${target%.md}-$n.md"
+    echo "  name taken, filing as $(basename "$target")" >&2
   fi
   mv "$f" "$target"
   moved=$((moved + 1))

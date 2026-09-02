@@ -10,7 +10,7 @@ allowed-tools:
   - Edit
 ---
 
-<!-- branch-review v2 -->
+<!-- branch-review v3 -->
 
 <objective>
 Review the changes on this branch against **the standards of the codebase they were added to**,
@@ -200,7 +200,10 @@ Write it with a Bash heredoc, not the Write tool. This skill is deliberately not
 `Write`, so that the approval gate can't be breached through it. That constraint holds here too.
 
 Destination: `${BRANCH_REVIEW_LOG_DIR:-$HOME/.branch-review-log}/`, created if absent.
-Filename: `YYYY-MM-DD-<repo>-<branch>.md`, with a `-2`, `-3` suffix if that name is taken.
+Filename: `YYYY-MM-DD-<repo>-<branch>-HHMMSS.md`, local time, zero-padded. Replace any
+`/` in the branch name with `-` — `feat/billing` in a filename would otherwise create a
+directory. The time is what keeps a second review of the same branch on the same day from
+landing on the first one; never write over an existing file.
 Never write the log into the repo under review — it isn't yours to add files to.
 
 Fill in everything mechanical. Leave every judgment call blank: the disposition column is

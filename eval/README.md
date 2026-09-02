@@ -20,10 +20,17 @@ Pull the entries over when you're back here:
 Then fill in the disposition column. That's the part no tool can do for you, and it's
 the only part that matters. One minute per review.
 
-`log/TEMPLATE.md` is the manual fallback for the portable prompt or another tool.
+`log/TEMPLATE.md` is the manual fallback for the portable prompt or another tool; name
+it the same way the skill does, `YYYY-MM-DD-<repo>-<branch>-HHMMSS.md`, so that reviewing
+the same branch twice in a day gives you two entries rather than one.
 
 The point is not the count of findings, it's **why you rejected the ones you rejected**.
 That column is the improvement backlog, ranked by frequency.
+
+Entries stay local — `.gitignore` keeps `eval/log/*.md` out of the repo, since a log
+names a real repository, a branch, and defects in code that may not be yours to publish.
+Only `TEMPLATE.md` is tracked. If you want them versioned, put them somewhere private
+rather than loosening this.
 
 ### Disposition codes
 

@@ -1,2 +1,7 @@
 .DS_Store
 eval/replay/
+
+# Review logs name real repos, branches, and defects in someone else's code.
+# This repo is public. Keep them local; only the template is tracked.
+eval/log/*.md
+!eval/log/TEMPLATE.md

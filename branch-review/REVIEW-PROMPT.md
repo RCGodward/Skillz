@@ -77,7 +77,8 @@ Then finish with what you reviewed (base, file count, anything deferred), one li
 the change does well if anything, and any pre-existing issues you left alone.
 
 **6. Then output a log entry** — one fenced markdown block I can save as
-`YYYY-MM-DD-<repo>-<branch>.md`. Write the file yourself if you can; paste it if you can't.
+`YYYY-MM-DD-<repo>-<branch>-HHMMSS.md` (local time; replace any `/` in the branch name
+with `-`). Write the file yourself if you can; paste it if you can't.
 Fill in everything mechanical and leave the disposition column empty — that's my call, and
 it's the whole reason the log exists.
 
