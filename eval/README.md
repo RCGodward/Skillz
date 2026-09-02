@@ -42,10 +42,18 @@ rather than loosening this.
 | `preexisting` | True, but not introduced by this branch, and not flagged as such | verify step |
 | `preference` | A convention this repo doesn't actually hold — cited nothing, or cited wrong | house_style / sibling selection |
 | `not-worth-it` | True and this repo's convention, but not worth the churn | severity calibration |
-| `missed` | Something you (or a human reviewer) caught that the skill didn't | the relevant review pass |
+| `missed` | Anything the review didn't report — caught by you, by a human reviewer, or by the skill itself while applying a fix (those are prefixed `[apply]`) | the relevant review pass |
 
 Use `missed` rows freely — record them with `-` in the number column. A skill that
 produces a clean, short, *incomplete* list is failing quietly, and nothing else surfaces it.
+
+The skill fills in some of these itself: when applying an approved fix turns up something
+the review should have caught, it adds a `missed` row noted `[apply]`. `tally.sh` splits
+those out, because they say something different — a miss it found on a closer read is the
+`<verify>` step not looking, while a miss you had to catch is the review pass not covering
+the ground at all. Issues in code the branch never touched are deliberately excluded; the
+review is told not to report pre-existing problems, so counting them as misses would
+penalise it for obeying that rule.
 
 Then:
 

@@ -10,7 +10,7 @@ allowed-tools:
   - Edit
 ---
 
-<!-- branch-review v3 -->
+<!-- branch-review v4 -->
 
 <objective>
 Review the changes on this branch against **the standards of the codebase they were added to**,
@@ -182,7 +182,8 @@ Then the one-line note about where the log entry landed (see `<log>`).
 
 When the user replies:
 - Apply exactly the approved items — nothing adjacent, no drive-by cleanups, no reformatting.
-- If applying one reveals a second issue, fix only what was approved and mention the new one.
+- If applying one reveals a second issue, fix only what was approved and mention the new
+  one. Record it in the log too — see "Discoveries during apply" in `<log>`.
 - If an approved fix turns out to be wrong on closer reading, say so instead of applying it.
 - After applying: list what changed, run the project's existing test/build command if there
   is an obvious one, and report the result honestly — including failures.
@@ -249,6 +250,35 @@ Then tell the user where it landed, in one line, after the approval prompt.
 **After the apply step**, go back and set `disposition: applied` on the rows the user
 approved. Leave every other row blank — you know what they declined, not why, and the
 reason is the part worth recording.
+
+### Discoveries during apply
+
+Applying a fix means reading the code far more closely than reviewing it did, so it is
+normal to find something the review pass missed. When that happens, add a row to the log
+in the same pass you mention it to the user.
+
+**Only if it was in scope for the review** — introduced by this branch, or code the diff
+touched that the branch made worse. That is a genuine miss and the log should say so.
+
+An issue in code the branch never touched is **not** a miss. The review is instructed not
+to report pre-existing problems, so logging one as `missed` would penalise the skill for
+following its own rule and inflate the number you steer by. Mention it to the user, and
+record it as an HTML comment under the table rather than a row.
+
+A qualifying row looks like:
+
+```
+| - | should-fix | correctness | missed | [apply] Cols==0 guard covers only one path |
+```
+
+- Number stays `-`; it was never in the numbered list.
+- Severity and category as you would have reported them.
+- **Prefix the note with `[apply]`.** It marks the row as self-found rather than caught by
+  the user, which `tally.sh` reports separately — the two mean different things about where
+  the review pass is weak.
+- Fill the blank placeholder `missed` row if it is still empty; otherwise append after it.
+- Disposition stays `missed` even if the user then approves a fix for it. The fact being
+  recorded is that the review didn't report it, not what happened afterwards.
 </log>
 
 <notes>

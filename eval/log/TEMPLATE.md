@@ -21,7 +21,10 @@ template only when logging by hand (the portable prompt, or another tool). Eithe
 format has to stay parseable by `tally.sh`.
 
 One row per finding, in the order presented. A `missed` row (number `-`) records anything
-you or a human reviewer caught that the review didn't; it needs a note to count.
+the review didn't report; it needs a note to count. The skill adds its own `missed` rows
+for anything it turns up while applying a fix, with the note prefixed `[apply]` — those
+count the same but are reported separately, since a miss it could find on a second look
+means something different from one it never saw at all.
 
 Severity: `blocker` | `should-fix` | `optional`
 Category: `correctness` | `security` | `style` | `comments`

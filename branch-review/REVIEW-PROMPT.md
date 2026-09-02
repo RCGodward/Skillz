@@ -113,6 +113,12 @@ me to recognize it later, not the whole finding. Category is `correctness`, `sec
 `style`, or `comments`. Keep the trailing `missed` row blank for me. If I later approve
 items, set those rows to `applied` and leave the rest alone.
 
+If applying a fix turns up something the review itself should have caught — introduced by
+this branch, or in code the diff touched — add a `missed` row for it with the note
+prefixed `[apply]`, e.g. `| - | should-fix | correctness | missed | [apply] guard covers
+only one path |`. Something in code the branch never touched is not a miss: mention it,
+but don't add a row for it.
+
 **Do not edit any code yet.** Not even trivial fixes. Wait for me to pick the numbers I
 want, then apply exactly those — nothing adjacent, no drive-by cleanups, no reformatting.
 After applying, tell me what changed, run the project's tests or build if there's an obvious

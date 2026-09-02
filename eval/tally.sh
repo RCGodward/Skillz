@@ -36,6 +36,7 @@ awk -F'|' '
     if (disp !~ /^(applied|wrong|handled|preexisting|preference|not-worth-it|missed)$/) next
     # an unfilled placeholder missed row carries no note — it is not a finding
     if (disp == "missed" && note == "") next
+    if (disp == "missed" && note ~ /^\[apply\]/) missed_apply++
     total++
     by_disp[disp]++
     if (cat != "") by_cat[cat]++
@@ -82,6 +83,15 @@ awk -F'|' '
     printf "  %-40s -> %s\n", "preference: " (by_disp["preference"] + 0), "<house_style> evidence rule; likely bad sibling selection"
     printf "  %-40s -> %s\n", "not-worth-it: " (by_disp["not-worth-it"] + 0), "<output> severity definitions need an anchor"
     printf "  %-40s -> %s\n", "missed: " (by_disp["missed"] + 0), "the <passes> section for that category"
+    if (by_disp["missed"] > 0) {
+      printf "  %-40s    %s\n", "",
+        "of those, " missed_apply + 0 " found by the review itself while applying a fix,"
+      printf "  %-40s    %s\n", "",
+        (by_disp["missed"] - missed_apply) " caught by you or a human reviewer"
+      if (missed_apply > 0 && missed_apply >= by_disp["missed"] - missed_apply)
+        printf "  %-40s    %s\n", "",
+          "-> mostly self-found: the code was readable enough, <verify> just did not look"
+    }
     print ""
     print "  Act on a reason once it clears ~12 occurrences, or when one category is"
     print "  clearly worse than the rest. Change one section at a time, then re-run"
