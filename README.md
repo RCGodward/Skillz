@@ -37,8 +37,11 @@ Then invoke it as `/branch-review`, optionally with a base branch, PR number, or
 /branch-review src/Billing --fix
 ```
 
-Each skill keeps its own `CHANGELOG.md` next to its `SKILL.md`, versioned with the
-`version` in its `.claude-plugin/plugin.json`. It installs along with the skill, so a copy
+Each skill keeps its own `CHANGELOG.md` next to its `SKILL.md`. One version number
+covers the skill, stated in three places that must agree — the marker at the top of
+`SKILL.md`, `version` in `.claude-plugin/plugin.json`, and the newest changelog heading.
+`./check-versions.sh` fails if they drift; the marker is what lands in every log's
+`skill_version`, so a mismatch means logs citing the wrong changelog section. It installs along with the skill, so a copy
 sitting in a client repo says what it is. Changes to the repo's own tooling — `install.sh`,
 `install.bat`, `eval/` — live in git history rather than a changelog.
 

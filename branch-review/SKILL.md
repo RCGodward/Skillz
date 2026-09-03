@@ -10,7 +10,7 @@ allowed-tools:
   - Edit
 ---
 
-<!-- branch-review v4 -->
+<!-- branch-review 0.5.0 -->
 
 <objective>
 Review the changes on this branch against **the standards of the codebase they were added to**,
@@ -220,7 +220,7 @@ base: <base branch or merge-base sha>
 language: <primary language of the diff>
 files_changed: <n>
 lines_changed: <n>
-skill_version: <the vN from the marker at the top of this SKILL.md>
+skill_version: <the version from the marker at the top of this SKILL.md>
 variant: skill
 tool: claude-code
 gate_held: yes

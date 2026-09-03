@@ -7,7 +7,7 @@ base: <base branch>
 language: <primary language>
 files_changed: <n>
 lines_changed: <n>
-skill_version: <git sha of Skillz at time of run>
+skill_version: <the version from the marker at the top of SKILL.md>
 variant: skill | portable-prompt
 tool: claude-code | cursor | copilot | codex | other
 gate_held: yes | no

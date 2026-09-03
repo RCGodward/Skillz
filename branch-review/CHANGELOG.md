@@ -3,6 +3,15 @@
 Versions match `.claude-plugin/plugin.json`. A log entry's `skill_version` field says
 which one produced it.
 
+## 0.5.0 — 2026-09-03
+
+- Version numbering collapsed to one authoritative value. The marker at the top of
+  `SKILL.md` now carries the semver rather than a separate `vN` counter, and
+  `check-versions.sh` at the repo root fails if the marker, `plugin.json`, and the top
+  changelog heading disagree. A log's `skill_version` now names a changelog section
+  directly.
+- Logs written before this say `v2`, `v3`, `v4`; those correspond to 0.2.0, 0.3.0, 0.4.0.
+
 ## 0.4.0 — 2026-09-02
 
 - The review now records anything it finds while applying an approved fix as a `missed`
@@ -47,6 +56,7 @@ which one produced it.
 - Ships a portable prompt variant for tools that don't load Claude Code skills.
 
 <!--
-Versions before 0.2.0 predate the marker in SKILL.md. Logs written by 0.2.0-0.4.0 record
-skill_version as v2/v3/v4, which correspond to 0.2.0/0.3.0/0.4.0.
+0.1.0 predates the marker in SKILL.md entirely. Logs written by 0.2.0-0.4.0 record
+skill_version as v2/v3/v4, which correspond to 0.2.0/0.3.0/0.4.0. From 0.5.0 the marker
+and the log field carry the semver itself.
 -->
