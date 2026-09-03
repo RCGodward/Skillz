@@ -6,7 +6,7 @@ Portable Claude Code skills, kept here and copied into client repos as needed.
 
 | Skill | What it does |
 |---|---|
-| [`branch-review`](branch-review/) | Reviews a branch for correctness, security, conformance to the *existing* code's style, and comment/doc-block discipline — then presents a numbered list of corrections and waits for approval before editing. |
+| [`branch-review`](branch-review/) | Reviews a branch for correctness, security, conformance to the *existing* code's style, and comment/doc-block discipline — then presents a numbered list of corrections and waits for approval before editing. ([changelog](branch-review/CHANGELOG.md)) |
 
 ## Installing into a client repo
 
@@ -36,6 +36,11 @@ Then invoke it as `/branch-review`, optionally with a base branch, PR number, or
 /branch-review 4821
 /branch-review src/Billing --fix
 ```
+
+Each skill keeps its own `CHANGELOG.md` next to its `SKILL.md`, versioned with the
+`version` in its `.claude-plugin/plugin.json`. It installs along with the skill, so a copy
+sitting in a client repo says what it is. Changes to the repo's own tooling — `install.sh`,
+`install.bat`, `eval/` — live in git history rather than a changelog.
 
 ## Evaluating and improving a skill
 
