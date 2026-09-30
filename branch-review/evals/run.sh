@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+# Run the branch-review plugin eval suite with the flags every run needs.
+#   branch-review/evals/run.sh                       # full suite, with and without the skill
+#   branch-review/evals/run.sh --smoke [case-glob]   # one run per case, skill arm only
+#   branch-review/evals/run.sh --case style-\* --runs 5   # anything else passes through
+set -euo pipefail
+
+evals="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+plugin="$(dirname "$evals")"
+
+args=()
+if [[ "${1:-}" == "--smoke" ]]; then
+  shift
+  args+=(--runs 1 --ablation none)
+  if [[ -n "${1:-}" && "$1" != -* ]]; then
+    args+=(--case "$1")
+    shift
+  fi
+fi
+
+# See bin/git and lib/fixture.sh for why macOS needs this. The entries are relative
+# because the shim lives inside each fixture's .git/, the only place the sandbox can read;
+# the ../ variants cover the review cd'ing into a subdirectory.
+if [[ "$(uname)" == Darwin ]]; then
+  export PATH=".git/eval-bin:../.git/eval-bin:../../.git/eval-bin:$PATH"
+fi
+
+exec claude plugin eval "$plugin" \
+  --scaffold \
+  --allow-tools Bash Edit \
+  --no-publish \
+  ${args[@]+"${args[@]}"} "$@"

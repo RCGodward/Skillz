@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# macOS only. /usr/bin/git is an xcrun shim, and xcrun dies inside the eval sandbox
+# because it can't write its cache under /var/folders. The sandbox also blocks PATH
+# lookup into the developer dir, but exec by full path works — so exec it directly.
+# lib/fixture.sh copies this into each fixture's .git/eval-bin, which run.sh puts on PATH.
+shopt -s execfail
+dev="$(xcode-select -p 2>/dev/null)"
+for g in ${dev:+"$dev/usr/bin/git"} /Applications/Xcode.app/Contents/Developer/usr/bin/git /Library/Developer/CommandLineTools/usr/bin/git; do
+  exec "$g" "$@"
+done
+echo "evals/bin/git: no git found outside the xcrun shim" >&2
+exit 127

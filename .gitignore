@@ -5,3 +5,6 @@ eval/replay/
 # This repo is public. Keep them local; only the template is tracked.
 eval/log/*.md
 !eval/log/TEMPLATE.md
+
+# plugin eval output: reports embed full transcripts.
+*/evals/results/

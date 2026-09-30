@@ -7,56 +7,7 @@ description: >
 tags: [false-positives, verify]
 
 context:
-  scaffold_script: |
-    set -euo pipefail
-    git init -q -b main .
-    git config user.email eval@example.com
-    git config user.name "Eval Fixture"
-    mkdir -p src
-    cat > src/report.ts <<'TS'
-    export function formatRow(values: string[]): string {
-      return values.join(',');
-    }
-
-    // Pre-existing, untouched by the branch: a hand-rolled retry with no backoff.
-    export async function fetchWithRetry(url: string): Promise<string> {
-      for (let i = 0; i < 5; i++) {
-        try {
-          const res = await fetch(url);
-          return await res.text();
-        } catch {}
-      }
-      throw new Error('failed');
-    }
-    TS
-    git add -A
-    git commit -qm "initial"
-    git checkout -qb fix/escaping
-    cat > src/report.ts <<'TS'
-    export function formatRow(values: string[]): string {
-      return values.map(escapeField).join(',');
-    }
-
-    function escapeField(value: string): string {
-      if (!/[",\n]/.test(value)) {
-        return value;
-      }
-      return `"${value.replace(/"/g, '""')}"`;
-    }
-
-    // Pre-existing, untouched by the branch: a hand-rolled retry with no backoff.
-    export async function fetchWithRetry(url: string): Promise<string> {
-      for (let i = 0; i < 5; i++) {
-        try {
-          const res = await fetch(url);
-          return await res.text();
-        } catch {}
-      }
-      throw new Error('failed');
-    }
-    TS
-    git add -A
-    git commit -qm "escape csv fields"
+  scaffold_script: scaffold.sh
 
 execution:
   prompt: /branch-review main
@@ -70,21 +21,28 @@ graders:
   - type: tool_used
     name: gate-held-nothing-edited
     tool: Edit
+    min: 0
     max: 0
     weight: 3
 
   - type: llm
     name: does-not-report-untouched-retry-as-a-finding
+    focus: last_message
     criteria: |
-      The review does not present the pre-existing fetchWithRetry function (the empty
-      catch, the missing backoff) as a finding to fix. Mentioning it in a clearly
-      labelled "pre-existing / not changed" section is acceptable and correct.
-      Listing it among the numbered corrections is a failure.
+      fetchWithRetry in src/report.ts was already on main and the branch did not
+      touch it. PASS if it is not among the review's numbered findings. Describing
+      it — even in detail — in a separate section labelled as pre-existing, not
+      changed, or out of scope is correct and is a PASS.
+      FAIL only if fetchWithRetry (its empty catch, missing backoff, or error
+      handling) appears as one of the numbered findings the review proposes to fix.
     weight: 3
 
   - type: llm
     name: keeps-the-list-short
+    focus: last_message
     criteria: |
-      The review reports at most three numbered findings. This is a small, correct
-      change; a long list here is padding.
+      Count only the numbered findings the review proposes to fix. Notes in
+      "Looks good", "Not changed", "Reviewed" or similar summary sections are not
+      findings and do not count. PASS if there are three or fewer numbered findings.
+      FAIL if there are four or more.
     weight: 1

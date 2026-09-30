@@ -7,65 +7,7 @@ description: >
 tags: [comments, house-style]
 
 context:
-  scaffold_script: |
-    set -euo pipefail
-    git init -q -b main .
-    git config user.email eval@example.com
-    git config user.name "Eval Fixture"
-    mkdir -p src
-    cat > src/orders.ts <<'TS'
-    import {Money} from './money';
-
-    export function orderTotal(lines: Line[]): Money {
-      return lines.reduce((sum, l) => sum.plus(l.amount), Money.zero());
-    }
-
-    export function applyTax(total: Money, rate: number): Money {
-      // Rates arrive as basis points from the tax service, not percent.
-      return total.times(1 + rate / 10000);
-    }
-    TS
-    cat > src/money.ts <<'TS'
-    export class Money {
-      private constructor(private readonly cents: number) {}
-      static zero(): Money { return new Money(0); }
-      plus(other: Money): Money { return new Money(this.cents + other.cents); }
-      times(factor: number): Money { return new Money(Math.round(this.cents * factor)); }
-    }
-    TS
-    cat > src/lines.ts <<'TS'
-    import {Money} from './money';
-
-    export interface Line {
-      sku: string;
-      amount: Money;
-    }
-    TS
-    git add -A
-    git commit -qm "initial"
-    git checkout -qb feat/discounts
-    cat > src/discounts.ts <<'TS'
-    import {Money} from './money';
-    import {Line} from './lines';
-
-    /**
-     * Applies a percentage discount to a set of order lines.
-     *
-     * @param lines - The order lines to discount.
-     * @param percent - The discount percentage to apply.
-     * @returns The discounted total as a Money value.
-     */
-    export function discountedTotal(lines: Line[], percent: number): Money {
-      // Loop through the lines and add them up
-      let total = Money.zero();
-      for (const line of lines) {
-        total = total.plus(line.amount);
-      }
-      return total.times(1 - percent / 100);
-    }
-    TS
-    git add -A
-    git commit -qm "add discounted total"
+  scaffold_script: scaffold.sh
 
 execution:
   prompt: /branch-review main
@@ -81,30 +23,39 @@ graders:
   - type: tool_used
     name: gate-held-nothing-edited
     tool: Edit
+    min: 0
     max: 0
     weight: 3
 
   - type: llm
     name: flags-the-jsdoc-as-out-of-place
     criteria: |
-      The review flags the JSDoc block on discountedTotal as inconsistent with this
-      codebase, on the grounds that no other file uses JSDoc, and proposes removing it.
-      It is not enough to merely mention the comment; it must treat it as a finding.
+      PASS if the review has a numbered finding about the JSDoc block on
+      discountedTotal (src/discounts.ts) that says the rest of the repo doesn't use
+      doc blocks and proposes removing it. The finding's severity label (Blocker,
+      Should fix, Optional) does not matter.
+      FAIL if the JSDoc block is not a numbered finding, or if the review proposes
+      keeping or expanding it.
     weight: 2
 
   - type: llm
     name: flags-the-restating-comment
     criteria: |
-      The review flags the inline comment "// Loop through the lines and add them up"
-      as restating what the code plainly does. It must NOT flag the comment in
-      src/orders.ts about basis points, which explains non-obvious behavior and
-      should be left alone.
+      PASS if the review proposes removing the inline comment "// Loop through the
+      lines and add them up" in src/discounts.ts because it restates what the code
+      does. Saying it disappears along with another proposed fix also counts.
+      The basis-points comment in src/orders.ts must be left alone: citing it as a
+      good example, or as the house pattern to follow, is fine and expected.
+      FAIL if the restating comment is not flagged, or if some proposed fix would
+      remove or rewrite the basis-points comment in src/orders.ts.
     weight: 2
 
   - type: llm
     name: does-not-propose-adding-doc-blocks
+    focus: last_message
     criteria: |
-      The review does not propose adding JSDoc, docstrings, or any other doc-comment
-      block to any function, including exported ones. Proposing to add documentation
-      anywhere in this fixture is a failure.
+      Look only at the fixes the review proposes. PASS if none of them adds a doc
+      comment (JSDoc, docstring, /** */ block, @param tags) to any function. Proposing
+      to REMOVE the existing JSDoc block is expected and is a PASS, not a FAIL.
+      FAIL only if some proposed fix would add new doc-comment text to the code.
     weight: 2
