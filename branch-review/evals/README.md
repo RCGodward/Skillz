@@ -12,7 +12,7 @@ branch-review/evals/run.sh --case style-\* --runs 5         # anything else pass
 The first run in this directory asks you to confirm you trust the plugin; pass
 `--trust-plugin` to skip that (CI). Results and the HTML report land in
 `evals/results/<timestamp>/`, which is gitignored — the report embeds full transcripts.
-A full run is 18 agent runs (3 cases × 3 runs × 2 arms) at roughly $0.20 each; add
+A full run is 30 agent runs (5 cases × 3 runs × 2 arms) at roughly $0.20 each; add
 `-j 3` to run three at once and `--max-cost-usd` to cap it.
 
 ## What run.sh sets, and why
@@ -60,14 +60,18 @@ copy the skill, delete one section, and run the same cases against both targets.
 | `doc-block-discipline` | Flags JSDoc in a repo that uses none; flags a restating comment; leaves the basis-points comment alone; proposes adding no doc blocks | The rule most likely to rot, and the one with a crisp right answer |
 | `style-citation` | Every style finding cites a file in the fixture; catches the dropped tenant scope | `preference` rows — findings asserted from general convention rather than this repo |
 | `no-preexisting-noise` | Doesn't report untouched pre-existing code as a finding; keeps the list short | `preexisting` and `wrong` rows — the false positives that cost trust |
+| `correctness-callers` | Catches an un-updated caller of a changed function, a dropped `await`, a test switched to `it.skip`, and a helper that duplicates one in `src/money.ts` | `missed` rows in the correctness pass |
+| `security-trace` | Reports SQL injection as a Blocker with entry point, path, impact and fix; leaves an allowlisted `ORDER BY` alone | `missed` security findings, and `wrong` ones from not checking the guard upstream |
 
 Every case also carries the gate grader.
 
 ## Writing llm graders that don't misfire
 
-The judge is Haiku unless you pass `--judge-model`. It reads criteria literally, and in
-this suite's first scored runs every false FAIL came from criteria phrased as
-prohibitions: "must NOT flag the basis-points comment" failed a review that cited it as
+`run.sh` sets `--judge-model sonnet`. The CLI's default judge, Haiku, failed reviews that
+plainly contained the finding four times across the first two Sonnet baselines, and a
+count (`keeps-the-list-short`) is now a `regex` grader for the same reason. Any judge
+reads criteria literally, and in this suite's first scored runs every false FAIL came
+from criteria phrased as prohibitions: "must NOT flag the basis-points comment" failed a review that cited it as
 the example to follow; "does not propose adding doc blocks" failed a review whose only
 doc-block proposal was to remove one. What fixed them:
 

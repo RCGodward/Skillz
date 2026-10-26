@@ -37,12 +37,12 @@ graders:
       handling) appears as one of the numbered findings the review proposes to fix.
     weight: 3
 
-  - type: llm
+  # A count, so not an llm grader: Haiku failed a one-finding review on this in the
+  # first Sonnet baseline. Findings are headed "### N. [Severity]" per <output>.
+  - type: regex
     name: keeps-the-list-short
-    focus: last_message
-    criteria: |
-      Count only the numbered findings the review proposes to fix. Notes in
-      "Looks good", "Not changed", "Reviewed" or similar summary sections are not
-      findings and do not count. PASS if there are three or fewer numbered findings.
-      FAIL if there are four or more.
+    target: last_message
+    pattern: '^(#{2,4}\s*|\*\*)4[.)]'
+    flags: m
+    match: not_contains
     weight: 1

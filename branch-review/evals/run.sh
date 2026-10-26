@@ -25,7 +25,10 @@ if [[ "$(uname)" == Darwin ]]; then
   export PATH=".git/eval-bin:../.git/eval-bin:../../.git/eval-bin:$PATH"
 fi
 
+# Haiku, the default judge, failed reviews that plainly contained the finding four times
+# in two Sonnet baselines. Sonnet keeps the whole suite on mid-tier models.
 exec claude plugin eval "$plugin" \
+  --judge-model sonnet \
   --scaffold \
   --allow-tools Bash Edit \
   --no-publish \

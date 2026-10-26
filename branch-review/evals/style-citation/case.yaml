@@ -35,11 +35,17 @@ graders:
 
   - type: llm
     name: style-findings-are-evidenced
+    focus: last_message
     criteria: |
-      Every style or convention finding in the review points at an existing file in
-      this repository as the example it should match (orderRepository.ts or
-      customerRepository.ts). A style finding asserted from general TypeScript
-      convention, with no example cited from this repo, fails this grader.
+      Judge only style or convention findings (naming, file layout, error-handling
+      pattern, return conventions). Correctness and security findings are not judged
+      here, whatever they cite.
+      PASS if every style finding cites at least one location in this repo with a
+      line number, as path:line or path:line-line (for example
+      src/repositories/orderRepository.ts:4 or orderRepository.ts:7-9). A finding
+      solely about a file's name may cite the sibling file path without a line.
+      FAIL if any finding about class, method, or variable names, or about code shape,
+      names a sibling file but gives no line number, or cites nothing from this repo.
     weight: 3
 
   - type: llm

@@ -1,0 +1,68 @@
+schema_version: "1.0"
+name: correctness-callers
+description: >
+  The branch changes applyDiscount from a whole-number percentage to a fraction and
+  updates one caller but not the other, so issueInvoice now discounts by 1500%. The
+  same branch drops an await on a save, skips the test that would have caught the
+  rounding change, and hand-rolls a rounding helper that src/money.ts already exports.
+tags: [correctness]
+
+context:
+  scaffold_script: scaffold.sh
+
+execution:
+  prompt: /branch-review main
+  allowed_tools: [Bash, Read, Grep, Glob, Edit]
+  max_turns: 40
+  timeout_seconds: 900
+
+runs: 3
+
+graders:
+  - type: tool_used
+    name: gate-held-nothing-edited
+    tool: Edit
+    min: 0
+    max: 0
+    weight: 3
+
+  - type: llm
+    name: flags-the-unupdated-caller
+    focus: last_message
+    criteria: |
+      PASS if a numbered finding says src/invoice.ts (issueInvoice) still passes a
+      whole-number percentage (15) to applyDiscount, which now expects a fraction, so
+      invoices are mis-discounted. The finding is about invoice.ts even though the
+      branch did not edit that file; that is correct and expected. Severity label
+      does not matter.
+      FAIL if invoice.ts's call to applyDiscount is not among the numbered findings.
+    weight: 3
+
+  - type: llm
+    name: flags-the-unawaited-save
+    focus: last_message
+    criteria: |
+      PASS if a numbered finding says saveOrder in src/checkout.ts is no longer
+      awaited (a dropped or floating promise). Severity label does not matter.
+      FAIL if the missing await is not among the numbered findings.
+    weight: 2
+
+  - type: llm
+    name: flags-the-skipped-test
+    focus: last_message
+    criteria: |
+      PASS if a numbered finding points out that the branch changed the rounding test
+      in test/pricing.test.ts to it.skip, rather than updating it to the new
+      fractional signature. Severity label does not matter.
+      FAIL if the skipped test is not among the numbered findings.
+    weight: 2
+
+  - type: llm
+    name: flags-the-duplicate-helper
+    focus: last_message
+    criteria: |
+      PASS if a numbered finding says roundToCents in src/checkout.ts duplicates
+      roundCents, which src/money.ts already exports, and proposes using the existing
+      one. FAIL if the duplication is not among the numbered findings, or if the
+      finding does not name src/money.ts.
+    weight: 1

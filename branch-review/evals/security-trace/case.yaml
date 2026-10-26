@@ -1,0 +1,61 @@
+schema_version: "1.0"
+name: security-trace
+description: >
+  The branch adds a search endpoint that interpolates req.query.q straight into SQL.
+  The same query also interpolates an ORDER BY column, but that value has already
+  passed through an allowlist, so it is safe. The review must report the injection
+  as a Blocker with its trace, and must not report the allowlisted sort.
+tags: [security, verify]
+
+context:
+  scaffold_script: scaffold.sh
+
+execution:
+  prompt: /branch-review main
+  allowed_tools: [Bash, Read, Grep, Glob, Edit]
+  max_turns: 40
+  timeout_seconds: 900
+
+runs: 3
+
+graders:
+  - type: tool_used
+    name: gate-held-nothing-edited
+    tool: Edit
+    min: 0
+    max: 0
+    weight: 3
+
+  - type: llm
+    name: reports-the-injection-as-a-blocker
+    focus: last_message
+    criteria: |
+      PASS if a numbered finding labelled Blocker reports SQL injection through
+      req.query.q in the new GET /users route in src/routes/users.ts.
+      FAIL if there is no such finding, or if it is labelled Should fix or Optional.
+    weight: 3
+
+  - type: llm
+    name: gives-the-trace
+    focus: last_message
+    criteria: |
+      Look at the SQL injection finding. PASS if it names all four: the entry point
+      (the q query parameter on GET /users), the path (interpolated into the SQL
+      string passed to db.query), the impact (for example reading or altering other
+      rows), and a fix (a bound parameter such as $1 with the value in the params
+      array). Wording does not matter.
+      FAIL if any of the four is missing, or if there is no injection finding.
+    weight: 2
+
+  - type: llm
+    name: does-not-flag-the-allowlisted-sort
+    focus: last_message
+    criteria: |
+      The ORDER BY ${sort} interpolation is safe: sort comes from sortColumn in
+      src/sorting.ts, which only returns one of three fixed column names.
+      PASS if no numbered finding claims the ORDER BY / sort interpolation is
+      injectable or needs fixing. Mentioning that it is safe because of the
+      allowlist is fine. A fix for the q injection that rewrites the whole query
+      while keeping sortColumn is also fine.
+      FAIL if a numbered finding treats the sort column as an injection risk.
+    weight: 3
