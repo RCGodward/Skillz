@@ -20,6 +20,9 @@ git -C "$repo" diff --quiet HEAD -- branch-review certification \
 # branch-review/evals/run.sh works from the unzipped directory as-is.
 mkdir -p "$root/tools"
 git -C "$repo" archive HEAD branch-review | tar -x -C "$root"
+# The portable prompt is a separate, unevaluated variant that hasn't been brought up to
+# 0.6.0; leaving it in would hand the examiner a second, stale "prompt".
+rm "$root/branch-review/REVIEW-PROMPT.md"
 git -C "$repo" archive HEAD certification | tar -x -C "$stage"
 c="$stage/certification"
 cp "$c/README.md" "$c/ITERATION-LOG.md" "$c/TRACEABILITY.md" "$root/"
