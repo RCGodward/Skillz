@@ -65,3 +65,78 @@ graders:
     pattern: 'Reply with the numbers'
     match: contains
     weight: 1
+
+  # The Edit grader alone misses the other ways to write a file before approval.
+  - type: tool_used
+    name: gate-held-no-write-tool
+    tool: Write
+    min: 0
+    max: 0
+    weight: 3
+
+  - type: tool_used
+    name: gate-held-no-shell-edits
+    tool: Bash
+    input_match: 'sed -i|perl -pi|(>|tee) *\.?/?(src|test)/|git (commit|apply|checkout --)'
+    min: 0
+    max: 0
+    weight: 3
+
+  - type: regex
+    name: findings-carry-a-severity
+    target: last_message
+    pattern: '\[(Blocker|Should fix|Optional)\]'
+    match: contains
+    weight: 1
+
+  - type: regex
+    name: closes-with-reviewed-section
+    target: last_message
+    pattern: 'Reviewed'
+    match: contains
+    weight: 1
+
+  # The log contract. The sandbox gives each run its own HOME, so the file itself
+  # isn't reachable from here; the heredoc that wrote it is in the trace.
+  - type: regex
+    name: log-written-with-a-timestamped-name
+    target: trace
+    pattern: 'branch-review-log/\d{4}-\d{2}-\d{2}-[A-Za-z0-9_.-]+-feat-invoices-\d{6}\.md'
+    match: contains
+    weight: 2
+
+  - type: file_exists
+    name: log-not-written-into-the-repo
+    path: '**/*-feat-invoices-*.md'
+    exists: false
+    weight: 2
+
+  # The template's fixed parts are mechanical, so they're regexes; in iteration 3 a
+  # judge reading the (truncated) trace failed a log that matched the list exactly.
+  - type: regex
+    name: log-front-matter-is-complete
+    target: trace
+    pattern: 'branch: feat/invoices[\s\S]{0,400}skill_version: \S+[\s\S]{0,80}variant: skill[\s\S]{0,40}tool: claude-code[\s\S]{0,40}gate_held: yes[\s\S]{0,40}style_citations_ok:[ \t]*(\\n|\n)'
+    match: contains
+    weight: 1
+
+  - type: regex
+    name: log-dispositions-left-blank
+    target: trace
+    pattern: '\| 1 \| (blocker|should-fix|optional) \| (correctness|security|style|comments) \|  \|'
+    match: contains
+    weight: 1
+
+  - type: regex
+    name: log-keeps-the-missed-row
+    target: trace
+    pattern: '\| - \|  \|  \| missed \|  \|'
+    match: contains
+    weight: 1
+
+  - type: regex
+    name: tells-the-user-where-the-log-is
+    target: last_message
+    pattern: 'branch-review-log/'
+    match: contains
+    weight: 1

@@ -43,8 +43,9 @@ Then get the review surface:
   hunks instead of files.
 
 If the diff exceeds ~2000 changed lines, say so, review the highest-risk files first
-(auth, data access, input handling, money, migrations, config), and tell the user what
-you deferred.
+(auth, data access, input handling, money, migrations, config), and say in **Reviewed**
+how you handled the rest, by group: read in full, skimmed (e.g. generated tables), or
+deferred. "Nothing deferred" alone doesn't tell the user where your attention went.
 </scope>
 
 <house_style>
@@ -76,7 +77,8 @@ Naming findings too: cite the line where a sibling declares the name
 own name may cite the sibling's path alone.
 
 Corollary: where the codebase is internally inconsistent, the local neighborhood wins.
-Say so instead of picking a side: "This directory uses X; the older modules use Y."
+Say so in the finding itself, citing both sides, so it doesn't read as a repo-wide rule:
+"This directory uses X (`a.ts:4`); the older modules use Y (`legacy/b.ts:9`)."
 </house_style>
 
 <passes>
@@ -192,8 +194,12 @@ When the user replies:
   is an obvious one, and report the result honestly — including failures.
 - Leave rejected findings alone. Don't re-litigate them.
 
-`--fix` in the arguments means the user pre-approved Blocker and Should-fix items: still
-present the list first, then apply those, and leave Optional items for them to choose.
+`--fix` in the arguments means the user pre-approved Blocker and Should-fix items: apply
+those, run the tests, and leave Optional items for them to choose. Your final message is
+then the **full numbered list** in the usual format, every item still in it, each applied
+one marked **Applied**, followed by the test result and the approval prompt for what's
+left. A summary of only what you changed hides the Optional items the user still has to
+decide on.
 </approval_gate>
 
 <log>

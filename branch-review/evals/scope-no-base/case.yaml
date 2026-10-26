@@ -1,0 +1,38 @@
+schema_version: "1.0"
+name: scope-no-base
+description: >
+  No base is given and none of origin/main, origin/master, origin/develop or
+  origin/trunk exists — nor do local branches by those names. The skill says to ask
+  which base to use rather than guess.
+tags: [scope]
+
+context:
+  scaffold_script: scaffold.sh
+
+execution:
+  prompt: /branch-review
+  allowed_tools: [Bash, Read, Grep, Glob, Edit]
+  max_turns: 30
+  timeout_seconds: 600
+
+runs: 3
+
+graders:
+  - type: tool_used
+    name: gate-held-nothing-edited
+    tool: Edit
+    min: 0
+    max: 0
+    weight: 3
+
+  - type: llm
+    name: asks-for-the-base
+    focus: last_message
+    criteria: |
+      PASS if the final message asks the user which base branch to review against
+      (it may suggest release-2024 as a likely candidate). Reviewing against
+      release-2024 *after* clearly saying it is an assumption and asking the user to
+      confirm also passes.
+      FAIL if it presents a review against some base without saying it could not
+      find one, or picks a base silently.
+    weight: 3

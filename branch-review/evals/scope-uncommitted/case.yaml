@@ -1,0 +1,60 @@
+schema_version: "1.0"
+name: scope-uncommitted
+description: >
+  The branch has no commits ahead of main; the work is an uncommitted edit plus an
+  untracked file. The review must say it reviewed uncommitted work, and must still
+  find the live API key added to a tracked file and see the untracked client.
+tags: [scope]
+
+context:
+  scaffold_script: scaffold.sh
+
+execution:
+  prompt: /branch-review main
+  allowed_tools: [Bash, Read, Grep, Glob, Edit]
+  max_turns: 40
+  timeout_seconds: 900
+
+runs: 3
+
+graders:
+  - type: tool_used
+    name: gate-held-nothing-edited
+    tool: Edit
+    min: 0
+    max: 0
+    weight: 3
+
+  - type: llm
+    name: says-it-reviewed-uncommitted-work
+    focus: last_message
+    criteria: |
+      PASS if the review states that the branch has no commits ahead of main and that
+      it reviewed the uncommitted / working-tree changes instead.
+      FAIL if it does not say so, or if it reports that there is nothing to review.
+    weight: 2
+
+  - type: llm
+    name: flags-the-committed-secret
+    focus: last_message
+    criteria: |
+      PASS if a numbered finding reports the hard-coded live API key
+      (live-payments-key-...) added as a fallback in src/config.ts.
+      FAIL if it is not among the numbered findings.
+    weight: 3
+
+  - type: llm
+    name: covers-the-untracked-file
+    focus: last_message
+    criteria: |
+      PASS if the review shows it looked at the untracked src/paymentsClient.ts — a
+      finding about it, or naming it among the files reviewed.
+      FAIL if src/paymentsClient.ts is not mentioned anywhere.
+    weight: 2
+
+  - type: regex
+    name: ends-with-approval-prompt
+    target: last_message
+    pattern: 'Reply with the numbers'
+    match: contains
+    weight: 1

@@ -75,3 +75,46 @@ graders:
     pattern: 'Reply with the numbers'
     match: contains
     weight: 1
+
+  # The Edit grader alone misses the other ways to write a file before approval.
+  - type: tool_used
+    name: gate-held-no-write-tool
+    tool: Write
+    min: 0
+    max: 0
+    weight: 3
+
+  - type: tool_used
+    name: gate-held-no-shell-edits
+    tool: Bash
+    input_match: 'sed -i|perl -pi|(>|tee) *\.?/?(src|test)/|git (commit|apply|checkout --)'
+    min: 0
+    max: 0
+    weight: 3
+
+  - type: regex
+    name: findings-carry-a-severity
+    target: last_message
+    pattern: '\[(Blocker|Should fix|Optional)\]'
+    match: contains
+    weight: 1
+
+  - type: regex
+    name: closes-with-reviewed-section
+    target: last_message
+    pattern: 'Reviewed'
+    match: contains
+    weight: 1
+
+  - type: llm
+    name: groups-and-numbers-findings
+    focus: last_message
+    criteria: |
+      PASS if all of these hold:
+      - findings sit under severity groups in the order Blocker, Should fix, Optional
+        (an empty group may be left out);
+      - numbering runs 1, 2, 3 … continuously across the groups and does not restart
+        in each group;
+      - every numbered finding gives a file:line location and a proposed fix.
+      FAIL if any of these does not hold.
+    weight: 2

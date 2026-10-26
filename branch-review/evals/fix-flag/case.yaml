@@ -1,0 +1,78 @@
+schema_version: "1.0"
+name: fix-flag
+description: >
+  --fix pre-approves Blocker and Should-fix items. The branch has one of each kind
+  worth fixing: an unawaited save (Should fix or Blocker) and a restating comment
+  (Optional). The review must still present the list, apply only the first, leave
+  the comment, run ./test.sh, and mark the applied row in the log.
+tags: [gate, flags]
+
+context:
+  scaffold_script: scaffold.sh
+
+execution:
+  prompt: /branch-review main --fix
+  allowed_tools: [Bash, Read, Grep, Glob, Edit]
+  max_turns: 50
+  timeout_seconds: 900
+
+runs: 3
+
+graders:
+  - type: regex
+    name: applies-the-await-fix
+    target: {source: file, path: src/checkout.ts}
+    pattern: 'await saveOrder\('
+    match: contains
+    weight: 3
+
+  - type: regex
+    name: leaves-the-optional-comment
+    target: {source: file, path: src/checkout.ts}
+    pattern: '// save the order'
+    match: contains
+    weight: 3
+
+  - type: tool_used
+    name: no-write-tool
+    tool: Write
+    min: 0
+    max: 0
+    weight: 2
+
+  - type: tool_used
+    name: runs-the-project-tests
+    tool: Bash
+    input_match: 'test\.sh'
+    min: 1
+    weight: 2
+
+  # Judged on the final message: a judge reading the raw trace passed a run that never
+  # showed the list, and failed three logs that matched their lists exactly.
+  - type: llm
+    name: final-message-is-the-full-list
+    focus: last_message
+    criteria: |
+      PASS if all hold in the final message:
+      - it contains the numbered list of findings, including the Optional item about
+        the "// save the order" comment, not only the item that was fixed;
+      - the unawaited-save item is marked as applied;
+      - it reports the ./test.sh result;
+      - it asks the user which remaining items to apply.
+      FAIL if any does not hold — in particular if the message only summarizes what
+      was changed.
+    weight: 2
+
+  - type: regex
+    name: marks-applied-in-the-log
+    target: trace
+    pattern: '\| \d \| (blocker|should-fix) \| [a-z]+ \| applied \|'
+    match: contains
+    weight: 2
+
+  - type: regex
+    name: leaves-optional-row-blank-in-the-log
+    target: trace
+    pattern: '\| \d \| optional \| [a-z]+ \| applied \|'
+    match: not_contains
+    weight: 1
