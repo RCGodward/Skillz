@@ -59,3 +59,12 @@ graders:
       to REMOVE the existing JSDoc block is expected and is a PASS, not a FAIL.
       FAIL only if some proposed fix would add new doc-comment text to the code.
     weight: 2
+
+  # The approval prompt is the user's cue to answer; if anything follows it, or the
+  # list landed in an earlier message, the review ended in the wrong place.
+  - type: regex
+    name: ends-with-approval-prompt
+    target: last_message
+    pattern: 'Reply with the numbers'
+    match: contains
+    weight: 1

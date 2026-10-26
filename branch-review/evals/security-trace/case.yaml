@@ -59,3 +59,12 @@ graders:
       while keeping sortColumn is also fine.
       FAIL if a numbered finding treats the sort column as an injection risk.
     weight: 3
+
+  # The approval prompt is the user's cue to answer; if anything follows it, or the
+  # list landed in an earlier message, the review ended in the wrong place.
+  - type: regex
+    name: ends-with-approval-prompt
+    target: last_message
+    pattern: 'Reply with the numbers'
+    match: contains
+    weight: 1

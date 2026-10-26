@@ -46,6 +46,7 @@ graders:
       solely about a file's name may cite the sibling file path without a line.
       FAIL if any finding about class, method, or variable names, or about code shape,
       names a sibling file but gives no line number, or cites nothing from this repo.
+      Also FAIL if the message contains no numbered findings at all.
     weight: 3
 
   - type: llm
@@ -55,3 +56,12 @@ graders:
       that both existing repositories apply, or otherwise flags it as a
       tenant-isolation problem.
     weight: 2
+
+  # The approval prompt is the user's cue to answer; if anything follows it, or the
+  # list landed in an earlier message, the review ended in the wrong place.
+  - type: regex
+    name: ends-with-approval-prompt
+    target: last_message
+    pattern: 'Reply with the numbers'
+    match: contains
+    weight: 1

@@ -139,4 +139,79 @@ rather than the fixture's names so the fix isn't fitted to the test.
 
 **Prediction:** `style-findings-are-evidenced` 3/3; nothing else moves.
 
-**Results:** _pending_
+**Results:**
+
+| Case | Baseline (0c) | Iteration 1 | Δ |
+|---|---|---|---|
+| correctness-callers | 100% | 100% | — |
+| doc-block-discipline | 100% | 100% | — |
+| no-preexisting-noise | 100% | 100% | — |
+| security-trace | 94% | 100% | +6 |
+| style-citation | 70% | 87% | +17 |
+| **Overall** | **92.8%** | **97.3%** | **+4.5** |
+| Δ vs. no skill | +18.9% | +26.0% | |
+
+**Green on the target:** `style-findings-are-evidenced` 0/3 → **3/3**.
+
+**Prediction partly wrong.** One `style-citation` run scored 0.6, failing
+`cites-a-file-and-line` and `catches-the-missing-tenant-scope`, which were 3/3 at
+baseline. Its final message was *only* the log line — "The evaluation log is at
+`…/2026-10-25-cwd-feat-invoices-202356.md`." The review presented its findings, then
+wrote the log in a separate tool call, then ended on a one-line message, so every
+`last_message` grader saw nothing. Not caused by this change (it touched only
+`<house_style>`); it's a latent ordering flaw in `<log>` that happened to fire here.
+Carried into iteration 2.
+
+`security-trace` reaching 100% is noise, not this change: the impact gap from 0c didn't
+recur in three runs, and nothing in the edit touches security. It stays on the list.
+
+The empty-message run also *passed* `style-findings-are-evidenced` — "every style finding
+cites a line" is vacuously true with no findings. Grader fixed in iteration 2.
+
+---
+
+## Iteration 2 — The approval prompt must be the last thing the user sees
+
+**Red:** 1 of 15 with-skill runs in iteration 1 (and 0 of 15 at 0c) ended on a message
+containing only the log path. A new deterministic grader, `ends-with-approval-prompt`
+(regex `Reply with the numbers` on `last_message`, traceability G2), applied
+retroactively to the recorded outputs: 0c 15/15, iteration 1 **14/15** — it fails on
+exactly that run.
+
+**Hypothesis:** `<log>` says to write the entry "after presenting the findings — and
+before you stop." That puts a tool call *between* the list and the end of the turn, and
+the model sometimes closes with a fresh short message after the tool result. If the log
+is written *before* the list is presented, the list, approval prompt, and log path are one
+final message with nothing after it.
+
+**Change (skill):** in `<log>`, write the entry once the findings are verified and
+before presenting them; the log path stays the last line of the list message.
+
+**Changes (evals):** `ends-with-approval-prompt` added to all five cases;
+`style-findings-are-evidenced` now FAILs when the message has no numbered findings.
+
+**Prediction:** `ends-with-approval-prompt` 15/15; no split-message runs.
+
+**Results:**
+
+| Case | Baseline (0c) | Iteration 1 | Iteration 2 |
+|---|---|---|---|
+| correctness-callers | 100% | 100% | 100% |
+| doc-block-discipline | 100% | 100% | 100% |
+| no-preexisting-noise | 100% | 100% | 100% |
+| security-trace | 94% | 100% | 100% |
+| style-citation | 70% | 87% | **100%** |
+| **Overall** | **92.8%** | **97.3%** | **100%** |
+| Δ vs. no skill | +18.9% | +26.0% | +31.7% |
+
+**Green:** `ends-with-approval-prompt` 15/15. Every with-skill run's final message holds
+the numbered findings, the approval prompt, and the log path, in that order — checked
+directly, not just through the graders, to confirm moving the log write earlier didn't
+drop it. `style-findings-are-evidenced` held at 3/3 under the stricter no-findings rule.
+
+**Prediction correct.** The without-skill arm scores 0/15 on the new grader, as it
+should — the approval prompt is the skill's own wording.
+
+**Caveat on 100%:** the suite now passes, but it still only grades the instructions
+listed ✅ in `TRACEABILITY.md`. A perfect score on a suite that ignores most of the
+prompt is not the same as a load-bearing prompt; that's iteration 3.

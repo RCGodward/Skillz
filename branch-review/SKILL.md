@@ -71,6 +71,9 @@ where they disagree, and mention the disagreement.
 **Hard rule:** every style finding must point at an existing example in this repo —
 `Matches src/Services/OrderService.cs:40-58` — or it does not get reported. If you cannot
 cite one, the convention is your preference, not theirs, and it is out of scope.
+Naming findings too: cite the line where a sibling declares the name
+(`src/Services/CustomerService.cs:12`), not just the name. Only a finding about a file's
+own name may cite the sibling's path alone.
 
 Corollary: where the codebase is internally inconsistent, the local neighborhood wins.
 Say so instead of picking a side: "This directory uses X; the older modules use Y."
@@ -194,8 +197,10 @@ present the list first, then apply those, and leave Optional items for them to c
 </approval_gate>
 
 <log>
-After presenting the findings — and before you stop — write an evaluation log entry.
-It exists so the user can score the review later without reconstructing it from memory.
+Once the findings are verified, and **before** you present them, write an evaluation log
+entry. It exists so the user can score the review later without reconstructing it from
+memory. Writing it first keeps the list, the approval prompt, and the log path in one final
+message; a tool call after the list tends to end the turn on a stray one-line reply.
 
 Write it with a Bash heredoc, not the Write tool. This skill is deliberately not granted
 `Write`, so that the approval gate can't be breached through it. That constraint holds here too.
@@ -245,7 +250,7 @@ style_citations_ok:
 - Leave `style_citations_ok` empty. Whether a citation actually supports the finding is the
   user's call, and self-grading it is worthless.
 
-Then tell the user where it landed, in one line, after the approval prompt.
+Then present the list, and put where the log landed on one line after the approval prompt.
 
 **After the apply step**, go back and set `disposition: applied` on the rows the user
 approved. Leave every other row blank — you know what they declined, not why, and the

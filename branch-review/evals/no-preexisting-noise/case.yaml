@@ -46,3 +46,12 @@ graders:
     flags: m
     match: not_contains
     weight: 1
+
+  # The approval prompt is the user's cue to answer; if anything follows it, or the
+  # list landed in an earlier message, the review ended in the wrong place.
+  - type: regex
+    name: ends-with-approval-prompt
+    target: last_message
+    pattern: 'Reply with the numbers'
+    match: contains
+    weight: 1
