@@ -95,9 +95,16 @@ for existing consumers (signature, serialization shape, DB schema, config keys);
 tests that assert the mock rather than the behavior, or that were deleted/skipped quietly.
 
 ### 2. Security
-Read `references/security-checklist.md` and work through the categories that apply to the
-languages and surfaces in this diff. Report a finding only where you can name the untrusted
-input and trace its path to the sink. Include severity and concrete impact.
+Read `references/security-checklist.md` before this pass, every time, even when the diff
+looks safe: the categories you wouldn't think of unprompted are the reason it exists. Work
+the ones that match the languages and surfaces in this diff.
+
+Report a finding only where you can trace it end to end, and state all four:
+- **Entry point** — the route, handler, job, or command, *and* the parameter
+  (`POST /orders`, body `couponCode`), not just the variable name.
+- **Path** — how the value reaches the sink.
+- **Impact** — what an attacker concretely gets: whose data, read or write, what scope.
+- **Fix** — the specific change.
 
 ### 3. Style conformance
 Only against conventions evidenced in `<house_style>`. Typical real findings: a new class

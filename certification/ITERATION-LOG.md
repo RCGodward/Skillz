@@ -215,3 +215,223 @@ should — the approval prompt is the skill's own wording.
 **Caveat on 100%:** the suite now passes, but it still only grades the instructions
 listed ✅ in `TRACEABILITY.md`. A perfect score on a suite that ignores most of the
 prompt is not the same as a load-bearing prompt; that's iteration 3.
+
+---
+
+## Iteration 3 — Grade the rest of the prompt (Red), then fix what it finds
+
+The suite passed, but it graded only ~25% of the instructions (`TRACEABILITY.md`). This
+iteration's Red step is coverage: write graders for everything testable, run them
+against the **unchanged** skill, and see which instructions Sonnet actually ignores.
+
+**Evals added (skill unchanged):**
+
+- Every pre-existing case: `gate-held-no-write-tool`, `gate-held-no-shell-edits`
+  (`sed -i`, redirects into `src/`, `git commit`…), `findings-carry-a-severity`,
+  `closes-with-reviewed-section`. `correctness-callers` also gets
+  `groups-and-numbers-findings`; `style-citation` gets the log contract.
+- Nine new cases: `scope-uncommitted`, `scope-path`, `scope-auto-base`, `scope-no-base`,
+  `large-diff`, `doc-block-match`, `declared-rules`, `security-only`, `fix-flag`.
+  Rows covered are listed in `TRACEABILITY.md`.
+
+**Red results** (skill arm only, 14 cases × 3 runs):
+
+| Case | Score | Failing grader |
+|---|---|---|
+| fix-flag | 86% | `lists-before-editing-and-reports-after` **0/3** |
+| large-diff | 78% | `says-what-it-deferred` **0/3** |
+| doc-block-match | 80% | `proposes-a-matching-doc-block` **0/3** |
+| declared-rules | 94% | `local-neighborhood-wins` 2/3 |
+| style-citation | 97% | `log-content-follows-the-template` 2/3 |
+| 9 other cases | 100% | — |
+| **Overall** | **95.4%** | 9/14 cases pass |
+
+Nine of the fourteen cases — including every scope case, `security-only`, and the gate
+and format graders on all five original cases — passed first time. Those instructions
+were already being followed; they are now *demonstrably* load-bearing rather than
+assumed to be.
+
+**Reading the five failures:**
+
+| Grader | Verdict | Evidence |
+|---|---|---|
+| `fix-flag / lists-before-editing…` | **Real.** | Ordering the trace: in 2 of 3 runs the numbered list never appears — only "I applied #1 and left #2 alone". In the third it appears *after* the first Edit. `--fix` says "still present the list first." |
+| `large-diff / says-what-it-deferred` | **Real, instruction too loose.** | The Blocker is caught every time, but Reviewed says "7 files, about 2,534 lines. Nothing deferred." — no statement that the diff was over the threshold, nor how the generated locale tables were treated. |
+| `doc-block-match / proposes-a-matching-doc-block` | **Grader too strict.** | Reviews flag the missing block and name the repo's `@param`/`@returns` convention but write "Add a matching block" instead of the block itself. `<output>` explicitly allows describing a fix longer than a line or two; the grader demanded more than the prompt asks for. |
+| `style-citation / log-content…` | **Judge error.** | The failing run's log table matches the presented list row-for-row (numbers, severities, categories). The judge saw a trace truncated at the front. |
+| `declared-rules / local-neighborhood-wins` | **Real, intermittent (1/3).** | Followed the `src/api` style correctly but never mentioned that `src/legacy` differs. Left for now; watched in the next run. |
+
+Also observed: `<house_style>` says both "Declared rules outrank inferred ones" and
+"Prefer what the code does over what a config claims." That's a contradiction for the
+`.prettierrc`-vs-code case — but Sonnet resolved it correctly 3/3 (`code-beats-the-
+formatter-config`, `mentions-the-config-disagreement`). No red, so it goes to Refactor as
+a wording fix, not here as a behavior fix.
+
+**Hypotheses and changes (skill):**
+
+1. `--fix`: "still present the list first" reads as satisfied by a summary at the end.
+   Make it explicit that the full numbered list is its own message *before the first
+   edit*, and say why. → predicts `lists-before-editing…` 3/3.
+2. Large diff: "tell the user what you deferred" is satisfiable by "nothing". Require
+   Reviewed to say, by file group, what was read in full, skimmed, or deferred. →
+   predicts `says-what-it-deferred` 3/3.
+
+The two edits are in different sections (`<approval_gate>`, `<scope>`) and target graders
+in different cases, so each one's effect stays attributable.
+
+**Changes (evals):**
+
+- `proposes-a-matching-doc-block`: accepts a described block that names the repo's
+  tags; still FAILs on tags the repo never uses.
+- `log-content-follows-the-template` (one judge) → three regexes for the mechanical
+  parts (front matter, blank dispositions, trailing `missed` row) plus one judge for
+  row-by-row agreement. Each regex was checked against the three recorded logs (all
+  pass) and against mutated copies — `gate_held: no`, a self-graded
+  `style_citations_ok`, a filled disposition, a dropped `missed` row, a `/` left in the
+  filename — and each mutation is caught by exactly the grader meant to catch it.
+
+**Results** (skill arm, 14 cases × 3):
+
+| Case | Red | Iteration 3 | Grader that moved |
+|---|---|---|---|
+| large-diff | 78% | **100%** | `says-what-it-deferred` 0/3 → **3/3** |
+| doc-block-match | 80% | **100%** | `proposes-a-matching-doc-block` 0/3 → 3/3 (grader fix) |
+| fix-flag | 86% | 90% | `lists-before-editing…` 0/3 → 1/3 |
+| declared-rules | 94% | 83% | `local-neighborhood-wins` 2/3 → 0/3 |
+| scope-auto-base | 100% | 93% | `resolves-the-base-from-origin` 3/3 → 2/3 |
+| style-citation | 97% | 93% | new `log-rows-match-the-findings` 0/3 |
+| 8 other cases | 100% | 100% | — |
+| **Overall** | **95.4%** | **97.2%** | |
+
+- **Hypothesis 2 confirmed.** `large-diff` 3/3: Reviewed now says the diff is ~2,500
+  lines, the auth file was read first, and the locale tables were skimmed.
+- **Hypothesis 1 rejected.** Ordering the `fix-flag` traces: in all three runs there is
+  no text before the first Edit — including the run the judge *passed*. Every run goes
+  log → edit → "I applied item 1…". Making "before the first edit" explicit changed
+  nothing. Likely interaction with iteration 2: "write the log, then present the list"
+  plus `--fix` gives the model a log → apply → summarize sequence where presenting the
+  list never happens.
+- `resolves-the-base-from-origin` — **grader fault.** The "failing" run found the base
+  with `git diff main...HEAD` and still caught the bug. The grader tested an
+  implementation detail (`merge-base`), not the behavior.
+- `log-rows-match-the-findings` — **judge fault, again.** A mechanical comparison shows the
+  log table matches the presented list row-for-row (numbers and severities) in all three
+  runs; the judge failed all three.
+- `local-neighborhood-wins` — **real.** 3 misses in 6 runs across two iterations: the
+  review follows the `src/api` pattern but doesn't mention `src/legacy`. Neither
+  iteration-3 edit touched `<house_style>`, so this is variance in an instruction that
+  was already weak, not a regression.
+
+**Lesson recorded:** judges with `focus: trace` were wrong 4 times out of 9 on these
+transcripts (20–40 KB of JSONL), in both directions. From here, anything about the trace
+is a `regex` or `tool_used` grader; judges read only the final message.
+
+---
+
+## Iteration 4 — `--fix` ends on the full list; inconsistent conventions name both sides
+
+**Red:** `fix-flag` list ordering 0/3 (by trace inspection); `local-neighborhood-wins` 0/3.
+
+**Hypotheses and changes (skill):**
+
+1. Sonnet will not hold "show the list before editing" when the flag has pre-approved
+   the edits, and two phrasings have failed. What the user actually needs from that rule
+   is to **see every finding, including the Optional ones still theirs to choose**. So
+   `--fix` now requires the *final* message to be the full numbered list, applied items
+   marked **Applied**, then the test result and the approval prompt for what's left.
+   This changes the skill's intended behavior, not just its wording; flagged to the user.
+   → predicts `final-message-is-the-full-list` 3/3.
+2. "Say so instead of picking a side" doesn't say *where*. Now: say it in the finding
+   itself, citing both sides, with an example. → predicts `local-neighborhood-wins` 3/3.
+
+**Changes (evals):**
+
+- `fix-flag`: the trace judge is replaced by `final-message-is-the-full-list` (judge on
+  the final message) and two regexes on the log: an applied Blocker/Should-fix row, and
+  no applied Optional row. Both regexes checked against all six recorded runs.
+- `scope-auto-base`: `resolves-the-base` accepts any base resolution (`merge-base`,
+  `origin/HEAD`, `main...`), not only `merge-base`.
+- `style-citation`: `log-rows-match-the-findings` dropped. Row-for-row agreement is
+  checked by `certification/check_log_rows.py` instead (see TRACEABILITY L6).
+
+**Results** (skill arm, 14 cases × 3):
+
+| Case | Iteration 3 | Iteration 4 | Grader that moved |
+|---|---|---|---|
+| fix-flag | 90% | **100%** | `final-message-is-the-full-list` **3/3** |
+| declared-rules | 83% | **100%** | `local-neighborhood-wins` 0/3 → **3/3** |
+| scope-auto-base | 93% | 100% | `resolves-the-base` 3/3 (grader fix) |
+| style-citation | 93% | 100% | (judge removed) |
+| security-trace | 100% | 93% | `gives-the-trace` 3/3 → 1/3 |
+| 9 other cases | 100% | 100% | — |
+| **Overall** | **97.2%** | **99.5%** | 13/14 cases pass |
+
+- **Both hypotheses confirmed.** `check_log_rows.py` also confirms the fix-flag and
+  style-citation logs match their lists.
+- `gives-the-trace` 1/3 is the security-impact gap first seen at 0c, back and wider.
+  This time both failing findings give impact ("read or alter arbitrary data"), path and
+  fix, but name only `req.query.q` — never the endpoint, `GET /users`; the passing run
+  wrote `/users?q=…`. The grader's reading of "entry point" is fair, and the prompt is
+  ambiguous: SKILL.md asks for "the untrusted input", the checklist for "the entry point".
+- Why the checklist's wording doesn't land: `style-citation`'s trace-capturing graders
+  show `references/security-checklist.md` was opened in **1 of 6** runs across
+  iterations 3–4. The read works in the sandbox (the one run that tried got the file), so
+  the model is skipping it. The four-part reporting rule exists *only* in that file.
+
+---
+
+## Iteration 5 — Security findings carry their own trace; the checklist is always read
+
+**Red:** `gives-the-trace` 1/3. New grader `reads-the-security-checklist`
+(`tool_used: Read`, `input_match: security-checklist`, min 1) on `security-trace` and
+`security-only`; predicted to fail from the 1-in-6 read rate above.
+
+**Hypotheses and changes (skill, `<passes>` §2 only):**
+
+1. The reporting rule lives only in a file that's usually skipped. Put it in SKILL.md and
+   define the entry point as the route/handler/command *and* the parameter.
+   → predicts `gives-the-trace` 3/3.
+2. "Read the checklist and work through the categories that apply" lets the model decide
+   none apply to it. Make the read unconditional and say why: the categories you
+   wouldn't think of are the reason it exists. → predicts `reads-the-security-checklist`
+   6/6.
+
+`reads-the-security-checklist` isolates change 2; `gives-the-trace` would move from
+change 1 alone even if the read still didn't happen.
+
+**Red, measured** (pre-change skill, the two security cases × 3):
+
+| Grader | Red |
+|---|---|
+| `gives-the-trace` | 1/3 |
+| `reads-the-security-checklist` | **4/6** (2/3 each case) |
+| `security-only / reports-no-style-or-comment-findings` | 2/3 |
+
+The 1-in-6 read rate above was an underestimate: it came from the only case whose graders
+happened to capture the full trace. Measured directly, the read happens 4 times in 6 —
+still not reliable. Process note: this red ran against the skill as of commit `1157205`
+(iteration 2), because the stash that removed the change also removed the uncommitted
+iteration 3–4 edits. Those edits don't touch the security pass, so the red is valid for
+these graders; iterations 3–4 were then committed separately (`b3126bd`).
+
+**Results** (the two security cases × 3):
+
+| Grader | Red | Iteration 5 |
+|---|---|---|
+| `gives-the-trace` | 1/3 | **3/3** |
+| `reads-the-security-checklist` | 4/6 | **5/6** |
+| `reports-no-style-or-comment-findings` | 2/3 | 3/3 |
+| security-trace | 91% | **100%** |
+| security-only | 86% | 94% |
+
+- **Hypothesis 1 confirmed.** Every injection finding now names the endpoint and the
+  parameter (`GET /users?q=…`), the path, a concrete impact, and the fix — most as four
+  labelled bullets.
+- **Hypothesis 2 partly confirmed.** 4/6 → 5/6. The run that skipped the checklist was a
+  4-turn `--security-only` review whose finding was nonetheless complete and correct. Not
+  iterated further: the outcome the read protects (a fully traced finding) is 6/6, and a
+  third phrasing would be tuning wording for a step the model judged unnecessary on a
+  one-file diff. Recorded as the one partial in the final traceability (P2).
+- `reports-no-style-or-comment-findings` 2/3 → 3/3 is not attributed to this change; the
+  red's miss was one Optional naming item, and nothing here targets it. Watched in the
+  full refactor run.
