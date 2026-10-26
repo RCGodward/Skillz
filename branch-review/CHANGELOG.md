@@ -3,6 +3,33 @@
 Versions match `.claude-plugin/plugin.json`. A log entry's `skill_version` field says
 which one produced it.
 
+## 0.6.0 — 2026-10-25
+
+Every change here came from an eval failure on Sonnet; `certification/ITERATION-LOG.md`
+has the before/after numbers for each.
+
+- Naming findings cite the line where a sibling declares the name, not just the name.
+- The log is written before the findings are presented, so the list, the approval prompt,
+  and the log path end the turn together. A tool call after the list sometimes ended the
+  turn on a bare log-path message.
+- `--fix` ends on the full numbered list with applied items marked **Applied**, then the
+  test result. It used to say "present the list first"; Sonnet would not hold that once
+  the edits were pre-approved, and its after-the-fact summary hid the Optional items.
+- Large diffs: **Reviewed** says, per file group, what was read in full, skimmed, or
+  deferred.
+- Inconsistent conventions: name both sides in the finding itself, with citations.
+- Security findings state entry point (route *and* parameter), path, impact, and fix.
+  That rule lived only in the checklist, which was often not opened; the checklist read
+  is now unconditional.
+- Declared rules: a rule written in `CONTRIBUTING.md`/`CLAUDE.md`/`AGENTS.md`/docs
+  outranks inferred conventions and gets cited; linter and formatter configs are weighed
+  against the code. The old text said both "declared rules outrank inferred ones" and
+  "prefer the code over the config". (A first rewording of the config sentence cut
+  `local-neighborhood-wins` from 5/6 to 1/6; the original sentence is kept verbatim.)
+- Removed: the flow summary, the file-history step, the `<notes>` section (restatements
+  of rules elsewhere), and a duplicated `.editorconfig`.
+- Eval suite: 3 cases → 15, Sonnet as both model and judge.
+
 ## 0.5.0 — 2026-09-03
 
 - Version numbering collapsed to one authoritative value. The marker at the top of

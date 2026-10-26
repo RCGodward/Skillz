@@ -1,0 +1,14 @@
+model: sonnet (judge: see ITERATION-LOG)  ablation: with-without
+
+style-only                   with     mean   67%   runs [0.67, 0.67, 0.67]
+    3/3  gate-held-nothing-edited
+    3/3  reports-the-naming-divergence
+    0/3  reports-no-security-findings
+    3/3  ends-with-approval-prompt
+style-only                   without  mean   67%   runs [0.56, 0.89, 0.56]
+    3/3  gate-held-nothing-edited
+    3/3  reports-the-naming-divergence
+    1/3  reports-no-security-findings
+    0/3  ends-with-approval-prompt
+
+overall score 66.7%  pass rate 0.0%  cases passed 0/1  mean delta +0.0%

@@ -1,10 +1,7 @@
 # Security checklist
 
-Work the categories that match the surfaces this diff actually touches. Report a finding
-only when you can name the untrusted input and trace it to the sink. "Could be unsafe"
-without a path is noise; skip it.
-
-For each real finding give: the entry point, the path, the impact, and the fix.
+Categories for the security pass in `SKILL.md`, which says how to report a finding.
+"Could be unsafe" without a traced path is noise; skip it.
 
 ## Input and injection
 - SQL / ORM raw fragments built with string concatenation or interpolation. Parameterize.

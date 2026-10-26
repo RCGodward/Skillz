@@ -1,0 +1,34 @@
+model: sonnet (judge: see ITERATION-LOG)  ablation: with-without
+
+doc-block-discipline         with     mean  100%   runs [1, 1, 1]
+    3/3  gate-held-nothing-edited
+    3/3  flags-the-jsdoc-as-out-of-place
+    3/3  flags-the-restating-comment
+    3/3  does-not-propose-adding-doc-blocks
+doc-block-discipline         without  mean   56%   runs [0.56, 0.56, 0.56]
+    3/3  gate-held-nothing-edited
+    0/3  flags-the-jsdoc-as-out-of-place
+    3/3  flags-the-restating-comment
+    0/3  does-not-propose-adding-doc-blocks
+
+no-preexisting-noise         with     mean   95%   runs [0.86, 1, 1]
+    3/3  gate-held-nothing-edited
+    3/3  does-not-report-untouched-retry-as-a-finding
+    2/3  keeps-the-list-short
+no-preexisting-noise         without  mean  100%   runs [1, 1, 1]
+    3/3  gate-held-nothing-edited
+    3/3  does-not-report-untouched-retry-as-a-finding
+    3/3  keeps-the-list-short
+
+style-citation               with     mean   80%   runs [1, 0.7, 0.7]
+    3/3  gate-held-nothing-edited
+    3/3  cites-a-file-and-line
+    1/3  style-findings-are-evidenced
+    3/3  catches-the-missing-tenant-scope
+style-citation               without  mean   60%   runs [0.5, 0.5, 0.8]
+    3/3  gate-held-nothing-edited
+    0/3  cites-a-file-and-line
+    1/3  style-findings-are-evidenced
+    3/3  catches-the-missing-tenant-scope
+
+overall score 91.7%  pass rate 66.7%  cases passed 1/3  mean delta +19.9%

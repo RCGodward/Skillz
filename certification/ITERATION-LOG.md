@@ -5,10 +5,13 @@ Red → Green → Refactor: a grader that fails for a reason we can name, one ch
 at that reason, and a re-run of the **whole** suite to confirm the change fixed the
 target without regressing anything else.
 
-All runs: `branch-review/evals/run.sh --model sonnet` (Claude Sonnet as the model under
-test, Claude Haiku as the LLM judge, 3 runs per case, `--ablation with-without` so every
-case also runs without the skill). Scores are weighted grader means per case; a case
-passes at 1.0. Raw results are summarized with `certification/summarize.py`.
+All runs: `branch-review/evals/run.sh --model sonnet` — Claude Sonnet as the model under
+test; the LLM judge is Haiku in 0a–0b and Sonnet from 0c on (`run.sh` pins it). 3 runs per
+case unless a table says 6. Baselines and the final run use `--ablation with-without`, so
+every case also runs with the skill disabled; red/green checks in between run the skill
+arm only, since the bare-model arm adds nothing to a red test. Scores are weighted grader
+means per case; a case passes at 1.0. Every table here comes from a file in `results/`,
+produced by `summarize.py` from the run's JSON.
 
 Iterations before this log (0.1.0–0.5.0, see `branch-review/CHANGELOG.md`) were driven
 by the disposition log from real use, not by eval scores, so they have no measured
@@ -435,3 +438,157 @@ these graders; iterations 3–4 were then committed separately (`b3126bd`).
 - `reports-no-style-or-comment-findings` 2/3 → 3/3 is not attributed to this change; the
   red's miss was one Optional naming item, and nothing here targets it. Watched in the
   full refactor run.
+
+---
+
+## Iteration 6 — Refactor: cut what no grader needs, prove nothing regressed
+
+**Change (skill, 0.6.0):** the cuts listed in `TRACEABILITY.md` ("Cut in the Refactor
+step"): the flow summary, a duplicated `.editorconfig`, the file-history step, the
+`<notes>` section (two restatements, one merged into declared rules), and the checklist's
+reporting preamble (now in SKILL.md). The declared-rules paragraph was also reworded to
+remove a contradiction ("declared rules outrank inferred ones" vs "prefer the code over
+the config").
+
+**Prediction:** no grader moves.
+
+**Refactor run** (14 cases, with and without the skill): **97.2%** with, Δ **+36.2**.
+But three graders that were 3/3 slipped:
+
+| Grader | Iteration 4–5 | Refactor (3 runs) |
+|---|---|---|
+| `declared-rules / local-neighborhood-wins` | 3/3 | 1/3 |
+| `declared-rules / mentions-the-config-disagreement` | 3/3 | 2/3 |
+| `scope-no-base / asks-for-the-base` | 3/3 | 2/3 |
+
+Three runs can't separate a regression from variance, so: **A/B at 6 runs each**, the
+iteration-5 skill (`97e7b28`) against the refactored one, same cases.
+
+| Grader (6 runs) | Before refactor | After refactor |
+|---|---|---|
+| `local-neighborhood-wins` | **5/6** | **1/6** |
+| `mentions-the-config-disagreement` | 6/6 | 6/6 |
+| `asks-for-the-base` | 5/6 | 6/6 |
+
+Two of the three were variance. `local-neighborhood-wins` was a real regression. Three
+of the refactor's edits touched `<house_style>`, so each was restored on its own (6 runs
+each):
+
+| Variant | `local-neighborhood-wins` |
+|---|---|
+| A — file-history step restored | 2/6 |
+| **B — original config-vs-code sentence restored** | **4/6** |
+| C — `<notes>` restored | 0/6 |
+
+**Cause: my rewrite of the config-vs-code sentence.** The new wording ("the code wins —
+don't flag code for following its neighbors") narrowed attention to the immediate
+neighbors, and Sonnet stopped surveying the wider repo, so it never saw `src/legacy`.
+The file-history and `<notes>` cuts are cleared by the same experiment. **Fix:** the
+original sentence, verbatim; the contradiction is resolved instead in the declared-rules
+step, which now scopes "a written rule outranks inference" to written documents and
+says configs are weighed against the code.
+
+Also in this step: a `style-only` case, so both scope flags are graded (P0). Its first
+run was 0/3 on `reports-no-security-findings`; reading the reviews, all three flagged the
+missing `tenantId` as a departure from the sibling repositories' pattern and said they
+had *not* done the security analysis. That's a legitimate style finding — the grader had
+assumed tenant scoping could only be a security issue. Regraded: a mechanical
+`skips-the-security-pass` (the checklist is not read) plus a judge that fails only
+findings argued as an exploit.
+
+## Final run — the submitted prompt
+
+**Skill:** 0.6.0, exactly as submitted · **Suite:** 15 cases × 3 runs × 2 arms · Sonnet
+as model and judge · cost $19.65 · `results/99-final-submission.txt`
+
+| Case | With skill | Without skill | Δ |
+|---|---|---|---|
+| correctness-callers | 100% | 74% | +26 |
+| declared-rules | 86% | 42% | +44 |
+| doc-block-discipline | 100% | 61% | +39 |
+| doc-block-match | 93% | 70% | +23 |
+| fix-flag | 100% | 69% | +31 |
+| large-diff | 93% | 33% | +60 |
+| no-preexisting-noise | 100% | 81% | +19 |
+| scope-auto-base | 100% | 70% | +30 |
+| scope-no-base | 100% | 67% | +33 |
+| scope-path | 100% | 90% | +10 |
+| scope-uncommitted | 100% | 73% | +27 |
+| security-only | 89% | 58% | +31 |
+| security-trace | 100% | 64% | +36 |
+| style-citation | 100% | 48% | +52 |
+| style-only | 88% | 91% | −3 |
+| **Overall** | **96.6%** | **66.1%** | **+30.5** |
+
+Ten cases at 100%. The failing graders, all intermittent:
+
+| Grader | Result | Read |
+|---|---|---|
+| `declared-rules / local-neighborhood-wins` | 1/3 | Unstable; see iteration 7 |
+| `declared-rules / mentions-the-config-disagreement` | 2/3 | 6/6 in the A/B; variance |
+| `doc-block-match / proposes-a-matching-doc-block` | 2/3 | One run argued one doc block "doesn't establish a convention" — a real reasoning slip; 8/9 across three iterations |
+| `large-diff / says-what-it-deferred` | 2/3 | One run said how it read each group but not that the diff was over the threshold |
+| `security-only / reads-the-security-checklist` | 1/3 | Unstable; see iteration 7 |
+| `style-only / skips-the-security-pass` | 1/3 | Reads the checklist anyway, reports no security findings; see iteration 7 |
+
+`style-only` is the one case where the skill scores *below* bare Sonnet, and only on
+`skips-the-security-pass` — bare Sonnet has no checklist to read. On the outcome
+(`reports-no-security-findings`) both arms pass.
+
+Log rows vs. findings (L6), checked by `check_log_rows.py` over kept traces:
+`results/99-log-rows-check.txt` — 3/3 match.
+
+## Iteration 7 — Two process instructions, two more phrasings (rejected)
+
+**Red:** from the final run — `local-neighborhood-wins` 1/3; checklist reads 1/3 under
+`--security-only`; checklist read anyway in 2/3 `--style-only` runs.
+
+**Hypotheses and changes:**
+
+1. The local-neighborhood rule says to name both sides of an inconsistency, but
+   `<house_style>` only tells the model to read the 2–3 *closest* siblings, so whether it
+   ever sees `src/legacy` is luck. Add: before calling a sibling pattern the convention,
+   grep for it and its alternative across the repo.
+2. "Read the checklist before this pass, every time" clashes with `--style-only`, where
+   the pass doesn't run, and evidently doesn't land under `--security-only`. Reword:
+   "whenever this pass runs — including under `--security-only`, where it is the whole
+   job".
+
+**Results** (6 runs each, `results/07-rejected-*.txt`):
+
+| Grader | Before | Iteration 7 |
+|---|---|---|
+| `local-neighborhood-wins` | 1/3 | **1/6** |
+| `security-only / reads-the-security-checklist` | 1/3 | 3/6 |
+| `security-trace / reads-the-security-checklist` | 3/3 | 4/6 |
+| `style-only / skips-the-security-pass` | 1/3 | 2/6 |
+
+**Both rejected; changes reverted.** Neither moved its grader beyond the run-to-run
+spread already seen. Across every run since iteration 3, `local-neighborhood-wins` passes
+about half the time under four different phrasings, and the checklist is read in roughly
+60–80% of security passes under three. These are process instructions Sonnet follows
+unreliably whatever the wording. The outcomes they protect hold up: complete, traced
+security findings 6/6 in this iteration, and no security findings under `--style-only`
+5/6.
+
+Not iterated further. The structural options — inlining a compact category list so no
+read is needed, or a fixture where the inconsistency sits inside the sibling set — change
+what is being tested rather than how well the prompt does it, and are listed as next
+steps in the README. The submitted prompt is the one the final run measured.
+
+## Summary
+
+| Step | Change | Overall (with skill) | What moved |
+|---|---|---|---|
+| 0c | Baseline, Sonnet judge | 92.8% (5 cases) | — |
+| 1 | Naming findings cite the declaring line | 97.3% | citations 0/3 → 3/3 |
+| 2 | Log written before the list | 100% | split-message runs 1/15 → 0/15 |
+| 3 | Grade the rest of the prompt; large-diff, `--fix` wording | 95.4% → 97.2% (14 cases) | large-diff 0/3 → 3/3; `--fix` hypothesis rejected |
+| 4 | `--fix` ends on the full list; name both sides | 99.5% | fix-flag 0/3 → 3/3; neighborhood 0/3 → 3/3 |
+| 5 | Security findings carry their own trace | (security cases) 97.2% | trace 1/3 → 3/3 |
+| 6 | Refactor; regression found by A/B, bisected, fixed | 97.2% → **96.6%** (15 cases) | neighborhood 1/6 → 4/6 with the cause restored |
+| 7 | Two process instructions reworded | — | rejected, reverted |
+
+Instructions graded: 20% at the start → 90% fully, 95% at least partly
+(`TRACEABILITY.md`). Skill vs. bare Sonnet: +18.9 points at baseline → **+30.5** on a
+suite three times the size.

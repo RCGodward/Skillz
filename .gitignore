@@ -8,3 +8,6 @@ eval/log/*.md
 
 # plugin eval output: reports embed full transcripts.
 */evals/results/
+
+# Built submission ZIP (certification/package.sh)
+certification/dist/

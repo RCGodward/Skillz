@@ -10,22 +10,19 @@ allowed-tools:
   - Edit
 ---
 
-<!-- branch-review 0.5.0 -->
+<!-- branch-review 0.6.0 -->
 
 <objective>
 Review the changes on this branch against **the standards of the codebase they were added to**,
 not against any external style guide. Produce a numbered, reviewable list of proposed
 corrections. Edit nothing until the user approves specific items.
-
-Flow: resolve scope → learn the house style → four review passes → verify findings →
-present list → **STOP** → apply only what was approved.
 </objective>
 
 <scope>
 Resolve what to review, in this order:
 
 1. `$ARGUMENTS` names a base branch (`main`, `develop`, `origin/release/2.1`) → diff against it.
-2. `$ARGUMENTS` is a PR number → `gh pr diff <n>`; fall back to fetching the branch if `gh` is absent.
+2. `$ARGUMENTS` is a PR number → that PR's diff (`gh pr diff`, or fetch its branch without `gh`).
 3. `$ARGUMENTS` is a path → restrict to files under it, still diffed against the base.
 4. No arguments → find the base automatically:
    `git merge-base HEAD $(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null || echo origin/main)`
@@ -54,15 +51,15 @@ look like it belongs where it is. You cannot assess that until you know what "th
 
 Gather evidence, cheapest first:
 
-1. **Declared rules** — read whatever exists: `.editorconfig`, `.eslintrc*`, `biome.json`,
-   `.prettierrc`, `.stylecop.json`, `.editorconfig`, `ruff.toml`/`pyproject.toml`,
-   `.rubocop.yml`, `checkstyle.xml`, `Directory.Build.props`, `CONTRIBUTING.md`,
-   `CLAUDE.md`/`AGENTS.md`, `docs/style*`. Declared rules outrank inferred ones.
+1. **Declared rules** — read whatever exists: `CONTRIBUTING.md`, `CLAUDE.md`/`AGENTS.md`,
+   `docs/style*`, and linter/formatter configs (`.editorconfig`, `.eslintrc*`, `biome.json`,
+   `.prettierrc`, `.stylecop.json`, `ruff.toml`/`pyproject.toml`, `.rubocop.yml`,
+   `checkstyle.xml`, `Directory.Build.props`). A rule written in those documents outranks
+   anything you infer; cite the file it comes from in the finding. Configs are weighed
+   against the code, below.
 2. **Sibling files** — for each changed file, read 2–3 existing files that are its closest
    analogs (same directory, same layer, same suffix: another controller, another repository,
    another reducer, another test). These are your ground truth.
-3. **The file's own history** — `git log --oneline -5 -- <file>` and the pre-change version
-   of the file. Code the branch *touched* should stay consistent with code it *didn't*.
 
 From that evidence, note the conventions that actually apply here — naming, file/class layout,
 error handling, logging, async style, null/optional handling, test structure, DI patterns,
@@ -298,12 +295,3 @@ A qualifying row looks like:
 - Disposition stays `missed` even if the user then approves a fix for it. The fact being
   recorded is that the review didn't report it, not what happened afterwards.
 </log>
-
-<notes>
-- Client codebases differ hard. When this repo's convention conflicts with your instinct,
-  the repo wins, silently — don't editorialize about the house style.
-- If the repo has a `CLAUDE.md`/`AGENTS.md` with review or style rules, those outrank
-  anything inferred here; follow them and say which rule you applied.
-- Non-git directories: fall back to reviewing what the user points you at, and say the
-  scope was manual.
-</notes>
