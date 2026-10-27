@@ -415,7 +415,7 @@ happened to capture the full trace. Measured directly, the read happens 4 times 
 still not reliable. Process note: this red ran against the skill as of commit `1157205`
 (iteration 2), because the stash that removed the change also removed the uncommitted
 iteration 3–4 edits. Those edits don't touch the security pass, so the red is valid for
-these graders; iterations 3–4 were then committed separately (`b3126bd`).
+these graders; iterations 3–4 were then committed separately (`930df44`).
 
 **Results** (the two security cases × 3):
 
@@ -462,7 +462,7 @@ But three graders that were 3/3 slipped:
 | `scope-no-base / asks-for-the-base` | 3/3 | 2/3 |
 
 Three runs can't separate a regression from variance, so: **A/B at 6 runs each**, the
-iteration-5 skill (`97e7b28`) against the refactored one, same cases.
+iteration-5 skill (`cfc4b14`) against the refactored one, same cases.
 
 | Grader (6 runs) | Before refactor | After refactor |
 |---|---|---|
@@ -592,3 +592,17 @@ steps in the README. The submitted prompt is the one the final run measured.
 Instructions graded: 20% at the start → 90% fully, 95% at least partly
 (`TRACEABILITY.md`). Skill vs. bare Sonnet: +18.9 points at baseline → **+30.5** on a
 suite three times the size.
+
+## Post-submission note — fixture secret reworded
+
+GitHub push protection rejected the branch: the `scope-uncommitted` fixture's planted
+credential was a made-up string in Stripe's live-key format (`sk_live_…`), which secret
+scanners can't tell from a real one. It is now `live-payments-key-…` — still an obvious
+hard-coded credential to a reviewer, but no vendor's format — and the unpushed history
+was rewritten so the old string appears in no commit (commit hashes from iteration 3 on
+changed; the references above are updated).
+
+The fixture changed after the final run, so the case was re-run, both arms
+(`results/99-scope-uncommitted-rekeyed.txt`): **100% with the skill** (unchanged), 82%
+without; `flags-the-committed-secret` 3/3 with the skill, 2/3 without. The final-run
+table stands.
