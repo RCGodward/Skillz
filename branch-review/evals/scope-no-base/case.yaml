@@ -2,7 +2,7 @@ schema_version: "1.0"
 name: scope-no-base
 description: >
   No base is given and none of origin/main, origin/master, origin/develop or
-  origin/trunk exists — nor do local branches by those names. The skill says to ask
+  origin/trunk exists -- nor do local branches by those names. The skill says to ask
   which base to use rather than guess.
 tags: [scope]
 

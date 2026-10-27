@@ -4,7 +4,11 @@ import sys
 
 result = json.load(open(sys.argv[1]))
 suite = result.get("suite", {})
-print(f"model: {suite.get('model', result.get('model', '?'))}  ablation: {suite.get('ablation')}")
+# CLI 2.1.311 replaced suite.model with modelOverride and judgeModel.
+model = suite.get("model", result.get("model"))
+if model is None and "modelOverride" in suite:
+    model = f"{suite['modelOverride']} (judge: {suite.get('judgeModel', '?')})"
+print(f"model: {model or '?'}  ablation: {suite.get('ablation')}")
 print()
 for case in result["cases"]:
     for arm, runs in case["arms"].items():

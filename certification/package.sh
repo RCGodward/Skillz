@@ -13,7 +13,7 @@ name="branch-review-stage3"
 root="$stage/$name"
 
 git -C "$repo" diff --quiet HEAD -- branch-review certification \
-  || { echo "uncommitted changes under branch-review/ or certification/ — commit first" >&2; exit 1; }
+  || { echo "uncommitted changes under branch-review/ or certification/ -- commit first" >&2; exit 1; }
 "$repo/check-versions.sh" >/dev/null
 
 # Everything comes out of HEAD, not the working tree. The skill keeps the repo's layout so
@@ -28,6 +28,13 @@ c="$stage/certification"
 cp "$c/README.md" "$c/ITERATION-LOG.md" "$c/TRACEABILITY.md" "$root/"
 cp -R "$c/results" "$root/results"
 cp "$c/summarize.py" "$c/check_log_rows.py" "$root/tools/"
+
+# ASCII only: an examiner's viewer may not be UTF-8, and a mangled em dash or check
+# mark reads as corruption.
+if LC_ALL=C grep -rn '[^ -~[:space:]]' "$root" >&2; then
+  echo "non-ASCII characters in the files above -- replace them before packaging" >&2
+  exit 1
+fi
 
 mkdir -p "$out"
 rm -f "$out/$name.zip"

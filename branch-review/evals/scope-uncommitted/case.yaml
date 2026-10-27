@@ -47,7 +47,7 @@ graders:
     name: covers-the-untracked-file
     focus: last_message
     criteria: |
-      PASS if the review shows it looked at the untracked src/paymentsClient.ts — a
+      PASS if the review shows it looked at the untracked src/paymentsClient.ts -- a
       finding about it, or naming it among the files reviewed.
       FAIL if src/paymentsClient.ts is not mentioned anywhere.
     weight: 2

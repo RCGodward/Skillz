@@ -113,7 +113,7 @@ graders:
       PASS if all of these hold:
       - findings sit under severity groups in the order Blocker, Should fix, Optional
         (an empty group may be left out);
-      - numbering runs 1, 2, 3 … continuously across the groups and does not restart
+      - numbering runs 1, 2, 3 ... continuously across the groups and does not restart
         in each group;
       - every numbered finding gives a file:line location and a proposed fix.
       FAIL if any of these does not hold.

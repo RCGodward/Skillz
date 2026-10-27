@@ -5,7 +5,7 @@ Categories for the security pass in `SKILL.md`, which says how to report a findi
 
 ## Input and injection
 - SQL / ORM raw fragments built with string concatenation or interpolation. Parameterize.
-  Check dynamic `ORDER BY`/table names — parameters don't cover identifiers; use an allowlist.
+  Check dynamic `ORDER BY`/table names -- parameters don't cover identifiers; use an allowlist.
 - Command execution built from input (`exec`, `spawn` with shell, `Process.Start`,
   backticks, `os.system`). Prefer argv arrays over shell strings.
 - Path traversal: user-controlled segments reaching file APIs. Canonicalize, then confirm
@@ -26,7 +26,7 @@ Categories for the security pass in `SKILL.md`, which says how to report a findi
 - CSV/formula injection in exported data.
 
 ## AuthN / AuthZ
-- A new endpoint, route, handler, or GraphQL resolver with no auth attribute/middleware —
+- A new endpoint, route, handler, or GraphQL resolver with no auth attribute/middleware --
   compare against how its siblings are protected; the gap is usually the tell.
 - Authorization checked in the UI, the caller, or the gateway but not at the resource.
 - IDOR: an object id from input loaded without an ownership/tenant scope check.
@@ -47,7 +47,7 @@ Categories for the security pass in `SKILL.md`, which says how to report a findi
 ## Crypto and data
 - Hand-rolled crypto, ECB mode, static/reused IVs, `Math.random` for anything security-bearing.
 - Passwords stored with a fast hash or no salt; use the platform's password hash.
-- MD5/SHA-1 for signatures or integrity (fine for a cache key — say which case it is).
+- MD5/SHA-1 for signatures or integrity (fine for a cache key -- say which case it is).
 - PII/PHI/card data newly written to logs, added to a response body, sent to a third party,
   or stored without the encryption the surrounding code applies.
 - Data-retention or deletion paths that miss a new store.
@@ -67,18 +67,18 @@ Categories for the security pass in `SKILL.md`, which says how to report a findi
 - Missing timeouts on outbound calls.
 
 ## Language-specific quick hits
-- **C#/.NET** — `BinaryFormatter`; `JsonSerializerSettings.TypeNameHandling`; SQL via
+- **C#/.NET** -- `BinaryFormatter`; `JsonSerializerSettings.TypeNameHandling`; SQL via
   `FromSqlRaw`/`ExecuteSqlRaw` with interpolation; `[AllowAnonymous]` added; `Html.Raw`;
   `ServerCertificateCustomValidationCallback` returning true; `Process.Start` with a shell.
-- **JS/TS** — prototype pollution in deep merges; `eval`/`new Function`/`setTimeout(string)`;
+- **JS/TS** -- prototype pollution in deep merges; `eval`/`new Function`/`setTimeout(string)`;
   `child_process.exec` vs `execFile`; Express routes missing auth middleware; `postMessage`
   handlers without an origin check; secrets in `NEXT_PUBLIC_*`/bundled client config.
-- **Python** — `pickle`, `yaml.load` without `SafeLoader`, `subprocess(..., shell=True)`,
+- **Python** -- `pickle`, `yaml.load` without `SafeLoader`, `subprocess(..., shell=True)`,
   f-strings in SQL, Jinja `|safe`, `assert` used for a runtime security check.
-- **Java** — native deserialization, `Runtime.exec` with a string, XXE defaults in
+- **Java** -- native deserialization, `Runtime.exec` with a string, XXE defaults in
   `DocumentBuilderFactory`, Spring endpoints missing `@PreAuthorize` where siblings have it.
-- **Go** — `fmt.Sprintf` into SQL, ignored errors on security-relevant calls, `InsecureSkipVerify`.
-- **SQL/migrations** — a migration that widens a permission, drops a constraint, backfills
+- **Go** -- `fmt.Sprintf` into SQL, ignored errors on security-relevant calls, `InsecureSkipVerify`.
+- **SQL/migrations** -- a migration that widens a permission, drops a constraint, backfills
   with a default that breaks a tenant scope, or is not reversible.
-- **IaC/CI** — public buckets, `0.0.0.0/0` ingress, wildcard IAM, secrets in workflow env,
+- **IaC/CI** -- public buckets, `0.0.0.0/0` ingress, wildcard IAM, secrets in workflow env,
   a workflow triggered by `pull_request_target` that checks out untrusted code.

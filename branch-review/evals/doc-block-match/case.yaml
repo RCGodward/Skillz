@@ -41,7 +41,7 @@ graders:
     criteria: |
       PASS if a numbered finding says the new exported getText lacks the JSDoc block
       every other exported function in this repo has, and proposes adding one in the
-      repo's shape — either by showing it, or by naming what it holds (a summary line,
+      repo's shape -- either by showing it, or by naming what it holds (a summary line,
       @param, @returns). <output> allows describing a fix rather than writing it out.
       FAIL if getText's missing doc block is not a numbered finding, or if the proposed
       block uses tags the repo never uses (@example, @throws, @async, {type} braces).
@@ -52,7 +52,7 @@ graders:
     focus: last_message
     criteria: |
       PASS if a numbered finding says the comment in getJson still says "three tries"
-      although the default is now 5 attempts — a stale comment.
+      although the default is now 5 attempts -- a stale comment.
       FAIL if that is not among the numbered findings.
     weight: 2
 

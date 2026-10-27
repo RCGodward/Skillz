@@ -60,7 +60,7 @@ graders:
     criteria: |
       PASS if a numbered finding says refunds.ts should use async/await with
       try/catch like its src/api siblings (orders.ts / customers.ts), and the review
-      acknowledges that src/legacy uses .then() — that is, it names the split rather
+      acknowledges that src/legacy uses .then() -- that is, it names the split rather
       than treating .then() as wrong everywhere.
       FAIL if the async-style finding is missing, or it doesn't acknowledge src/legacy.
     weight: 2

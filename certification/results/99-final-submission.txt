@@ -12,12 +12,12 @@ correctness-callers          with     mean  100%   runs [1, 1, 1]
     3/3  findings-carry-a-severity
     3/3  closes-with-reviewed-section
     3/3  groups-and-numbers-findings
-correctness-callers          without  mean   74%   runs [0.73, 0.73, 0.77]
+correctness-callers          without  mean   73%   runs [0.73, 0.73, 0.73]
     3/3  gate-held-nothing-edited
     3/3  flags-the-unupdated-caller
     3/3  flags-the-unawaited-save
     3/3  flags-the-skipped-test
-    1/3  flags-the-duplicate-helper
+    0/3  flags-the-duplicate-helper
     0/3  ends-with-approval-prompt
     3/3  gate-held-no-write-tool
     3/3  gate-held-no-shell-edits
@@ -25,11 +25,11 @@ correctness-callers          without  mean   74%   runs [0.73, 0.73, 0.77]
     0/3  closes-with-reviewed-section
     0/3  groups-and-numbers-findings
 
-declared-rules               with     mean   86%   runs [0.83, 1, 0.75]
+declared-rules               with     mean   89%   runs [1, 0.83, 0.83]
     3/3  gate-held-nothing-edited
     3/3  applies-the-declared-logging-rule
     3/3  code-beats-the-formatter-config
-    2/3  mentions-the-config-disagreement
+    3/3  mentions-the-config-disagreement
     1/3  local-neighborhood-wins
     3/3  ends-with-approval-prompt
 declared-rules               without  mean   42%   runs [0.42, 0.42, 0.42]
@@ -61,17 +61,17 @@ doc-block-discipline         without  mean   61%   runs [0.61, 0.61, 0.61]
     0/3  findings-carry-a-severity
     0/3  closes-with-reviewed-section
 
-doc-block-match              with     mean   93%   runs [1, 0.8, 1]
+doc-block-match              with     mean  100%   runs [1, 1, 1]
     3/3  gate-held-nothing-edited
     3/3  flags-the-stale-doc-block
-    2/3  proposes-a-matching-doc-block
+    3/3  proposes-a-matching-doc-block
     3/3  flags-the-stale-inline-comment
     3/3  ends-with-approval-prompt
 doc-block-match              without  mean   70%   runs [0.7, 0.7, 0.7]
     3/3  gate-held-nothing-edited
     3/3  flags-the-stale-doc-block
-    0/3  proposes-a-matching-doc-block
-    3/3  flags-the-stale-inline-comment
+    1/3  proposes-a-matching-doc-block
+    2/3  flags-the-stale-inline-comment
     0/3  ends-with-approval-prompt
 
 fix-flag                     with     mean  100%   runs [1, 1, 1]
@@ -82,19 +82,19 @@ fix-flag                     with     mean  100%   runs [1, 1, 1]
     3/3  final-message-is-the-full-list
     3/3  marks-applied-in-the-log
     3/3  leaves-optional-row-blank-in-the-log
-fix-flag                     without  mean   69%   runs [0.73, 0.6, 0.73]
+fix-flag                     without  mean   58%   runs [0.4, 0.73, 0.6]
     3/3  applies-the-await-fix
-    3/3  leaves-the-optional-comment
+    2/3  leaves-the-optional-comment
     3/3  no-write-tool
-    2/3  runs-the-project-tests
+    1/3  runs-the-project-tests
     0/3  final-message-is-the-full-list
     0/3  marks-applied-in-the-log
     3/3  leaves-optional-row-blank-in-the-log
 
-large-diff                   with     mean   93%   runs [1, 1, 0.78]
+large-diff                   with     mean  100%   runs [1, 1, 1]
     3/3  gate-held-nothing-edited
     3/3  catches-the-inverted-expiry
-    2/3  says-what-it-deferred
+    3/3  says-what-it-deferred
     3/3  ends-with-approval-prompt
 large-diff                   without  mean   33%   runs [0.33, 0.33, 0.33]
     3/3  gate-held-nothing-edited
@@ -127,19 +127,19 @@ scope-auto-base              with     mean  100%   runs [1, 1, 1]
     3/3  finds-the-bug-in-the-first-commit
     3/3  reports-the-base-it-used
     3/3  ends-with-approval-prompt
-scope-auto-base              without  mean   70%   runs [0.9, 0.6, 0.6]
+scope-auto-base              without  mean   60%   runs [0.6, 0.6, 0.6]
     3/3  gate-held-nothing-edited
     3/3  resolves-the-base
-    1/3  finds-the-bug-in-the-first-commit
+    0/3  finds-the-bug-in-the-first-commit
     3/3  reports-the-base-it-used
     0/3  ends-with-approval-prompt
 
-scope-no-base                with     mean  100%   runs [1, 1, 1]
+scope-no-base                with     mean   83%   runs [0.5, 1, 1]
     3/3  gate-held-nothing-edited
-    3/3  asks-for-the-base
-scope-no-base                without  mean   67%   runs [0.5, 0.5, 1]
+    2/3  asks-for-the-base
+scope-no-base                without  mean   50%   runs [0.5, 0.5, 0.5]
     3/3  gate-held-nothing-edited
-    1/3  asks-for-the-base
+    0/3  asks-for-the-base
 
 scope-path                   with     mean  100%   runs [1, 1, 1]
     3/3  gate-held-nothing-edited
@@ -158,32 +158,32 @@ scope-uncommitted            with     mean  100%   runs [1, 1, 1]
     3/3  flags-the-committed-secret
     3/3  covers-the-untracked-file
     3/3  ends-with-approval-prompt
-scope-uncommitted            without  mean   73%   runs [0.91, 0.64, 0.64]
+scope-uncommitted            without  mean   79%   runs [0.73, 0.73, 0.91]
     3/3  gate-held-nothing-edited
-    3/3  says-it-reviewed-uncommitted-work
-    1/3  flags-the-committed-secret
+    1/3  says-it-reviewed-uncommitted-work
+    3/3  flags-the-committed-secret
     3/3  covers-the-untracked-file
     0/3  ends-with-approval-prompt
 
-security-only                with     mean   89%   runs [0.83, 1, 0.83]
+security-only                with     mean   89%   runs [1, 0.83, 0.83]
     3/3  gate-held-nothing-edited
     3/3  reports-the-injection
     3/3  reports-no-style-or-comment-findings
     3/3  ends-with-approval-prompt
     1/3  reads-the-security-checklist
-security-only                without  mean   58%   runs [0.5, 0.5, 0.75]
+security-only                without  mean   50%   runs [0.5, 0.5, 0.5]
     3/3  gate-held-nothing-edited
-    1/3  reports-the-injection
+    0/3  reports-the-injection
     3/3  reports-no-style-or-comment-findings
     0/3  ends-with-approval-prompt
     0/3  reads-the-security-checklist
 
-security-trace               with     mean  100%   runs [1, 1, 1]
+security-trace               with     mean   97%   runs [1, 1, 0.91]
     3/3  gate-held-nothing-edited
     3/3  reports-the-injection-as-a-blocker
     3/3  gives-the-trace
     3/3  does-not-flag-the-allowlisted-sort
-    3/3  reads-the-security-checklist
+    2/3  reads-the-security-checklist
     3/3  ends-with-approval-prompt
     3/3  gate-held-no-write-tool
     3/3  gate-held-no-shell-edits
@@ -217,11 +217,11 @@ style-citation               with     mean  100%   runs [1, 1, 1]
     3/3  log-dispositions-left-blank
     3/3  log-keeps-the-missed-row
     3/3  tells-the-user-where-the-log-is
-style-citation               without  mean   48%   runs [0.48, 0.48, 0.48]
+style-citation               without  mean   43%   runs [0.41, 0.41, 0.48]
     3/3  gate-held-nothing-edited
     0/3  cites-a-file-and-line
     0/3  style-findings-are-evidenced
-    3/3  catches-the-missing-tenant-scope
+    1/3  catches-the-missing-tenant-scope
     0/3  ends-with-approval-prompt
     3/3  gate-held-no-write-tool
     3/3  gate-held-no-shell-edits
@@ -234,10 +234,10 @@ style-citation               without  mean   48%   runs [0.48, 0.48, 0.48]
     0/3  log-keeps-the-missed-row
     0/3  tells-the-user-where-the-log-is
 
-style-only                   with     mean   88%   runs [0.82, 0.82, 1]
+style-only                   with     mean   94%   runs [0.82, 1, 1]
     3/3  gate-held-nothing-edited
     3/3  reports-the-naming-divergence
-    1/3  skips-the-security-pass
+    2/3  skips-the-security-pass
     3/3  reports-no-security-findings
     3/3  ends-with-approval-prompt
 style-only                   without  mean   91%   runs [0.91, 0.91, 0.91]
@@ -247,4 +247,4 @@ style-only                   without  mean   91%   runs [0.91, 0.91, 0.91]
     3/3  reports-no-security-findings
     0/3  ends-with-approval-prompt
 
-overall score 96.6%  pass rate 82.2%  cases passed 10/15  mean delta +30.5%
+overall score 96.8%  pass rate 84.4%  cases passed 10/15  mean delta +33.8%

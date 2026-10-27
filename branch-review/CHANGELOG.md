@@ -3,7 +3,7 @@
 Versions match `.claude-plugin/plugin.json`. A log entry's `skill_version` field says
 which one produced it.
 
-## 0.6.0 — 2026-10-25
+## 0.6.0 -- 2026-10-25
 
 Every change here came from an eval failure on Sonnet; `certification/ITERATION-LOG.md`
 has the before/after numbers for each.
@@ -28,9 +28,9 @@ has the before/after numbers for each.
   `local-neighborhood-wins` from 5/6 to 1/6; the original sentence is kept verbatim.)
 - Removed: the flow summary, the file-history step, the `<notes>` section (restatements
   of rules elsewhere), and a duplicated `.editorconfig`.
-- Eval suite: 3 cases → 15, Sonnet as both model and judge.
+- Eval suite: 3 cases -> 15, Sonnet as both model and judge.
 
-## 0.5.0 — 2026-09-03
+## 0.5.0 -- 2026-09-03
 
 - Version numbering collapsed to one authoritative value. The marker at the top of
   `SKILL.md` now carries the semver rather than a separate `vN` counter, and
@@ -39,18 +39,18 @@ has the before/after numbers for each.
   directly.
 - Logs written before this say `v2`, `v3`, `v4`; those correspond to 0.2.0, 0.3.0, 0.4.0.
 
-## 0.4.0 — 2026-09-02
+## 0.4.0 -- 2026-09-02
 
 - The review now records anything it finds while applying an approved fix as a `missed`
   row in the log, instead of leaving it to be reconstructed from the transcript. Scoped to
-  issues the branch introduced or worsened — a problem in untouched code is not a miss,
+  issues the branch introduced or worsened -- a problem in untouched code is not a miss,
   because the review is told not to report pre-existing issues. Those get an HTML comment
   under the table instead.
 - Self-found misses are noted `[apply]` so `tally.sh` can report them separately from the
   ones a human caught. A miss found on a closer read points at `<verify>`; a miss you had
   to catch points at the review pass itself.
 
-## 0.3.0 — 2026-09-02
+## 0.3.0 -- 2026-09-02
 
 - Log filenames carry a timestamp (`YYYY-MM-DD-<repo>-<branch>-HHMMSS.md`). Reviewing a
   branch, applying fixes, and reviewing again the same day used to overwrite the first
@@ -60,7 +60,7 @@ has the before/after numbers for each.
 - Replaced the `-2`/`-3` collision suffix with a plain never-overwrite rule; the suffix
   scheme depended on remembering to check for a collision, which is what failed.
 
-## 0.2.0 — 2026-09-02
+## 0.2.0 -- 2026-09-02
 
 - The review writes its own pre-filled evaluation log when it reports findings, to
   `~/.branch-review-log/` (`BRANCH_REVIEW_LOG_DIR` overrides), and sets `applied` on
@@ -71,7 +71,7 @@ has the before/after numbers for each.
 - Packaged as a plugin (`.claude-plugin/plugin.json`) with a `claude plugin eval` suite
   under `evals/`, so the skill is a valid eval target. `install.sh` strips `evals/`.
 
-## 0.1.0 — 2026-09-01
+## 0.1.0 -- 2026-09-01
 
 - Initial skill. One pass over a branch covering correctness, security audit, conformance
   to the surrounding code's existing style, and comment/doc-block discipline, ending in a

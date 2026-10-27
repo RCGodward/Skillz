@@ -31,7 +31,7 @@ graders:
     criteria: |
       fetchWithRetry in src/report.ts was already on main and the branch did not
       touch it. PASS if it is not among the review's numbered findings. Describing
-      it — even in detail — in a separate section labelled as pre-existing, not
+      it -- even in detail -- in a separate section labelled as pre-existing, not
       changed, or out of scope is correct and is a PASS.
       FAIL only if fetchWithRetry (its empty catch, missing backoff, or error
       handling) appears as one of the numbered findings the review proposes to fix.

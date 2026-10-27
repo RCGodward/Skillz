@@ -59,7 +59,7 @@ graders:
       - the unawaited-save item is marked as applied;
       - it reports the ./test.sh result;
       - it asks the user which remaining items to apply.
-      FAIL if any does not hold — in particular if the message only summarizes what
+      FAIL if any does not hold -- in particular if the message only summarizes what
       was changed.
     weight: 2
 

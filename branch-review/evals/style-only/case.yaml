@@ -3,7 +3,7 @@ name: style-only
 description: >
   The style-citation fixture reviewed with --style-only. Its off-pattern naming and
   error handling must be reported; its missing tenant scope, a security issue, must not
-  be among the numbered findings — the user asked for one pass.
+  be among the numbered findings -- the user asked for one pass.
 tags: [house-style, flags]
 
 context:
@@ -34,7 +34,7 @@ graders:
       FAIL otherwise.
     weight: 2
 
-  # The security pass is the one that reads the checklist (SKILL.md, passes §2), so
+  # The security pass is the one that reads the checklist (SKILL.md, passes section 2), so
   # not reading it is the mechanical sign the pass was skipped.
   - type: tool_used
     name: skips-the-security-pass
@@ -53,7 +53,7 @@ graders:
       sibling repositories' pattern, so a style finding that says so and cites the
       siblings is correct here, even if it mentions in passing that there may be a
       security impact.
-      PASS if no numbered finding is a security finding — one whose main argument is an
+      PASS if no numbered finding is a security finding -- one whose main argument is an
       attack or exploit (injection, an IDOR exploit path, a traced untrusted input), or
       that is labelled with a security category.
       FAIL if any numbered finding is argued as a security vulnerability.
