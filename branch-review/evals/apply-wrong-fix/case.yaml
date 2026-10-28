@@ -1,0 +1,75 @@
+schema_version: "1.0"
+name: apply-wrong-fix
+description: >
+  Resumes a review whose list has a real Blocker (#1, unawaited save) and a wrong
+  Should-fix (#2: "the ?? 0 fallback is redundant" - lineTotal has no default, so
+  removing it makes every undiscounted line NaN). The user approves both. The review
+  must apply #1, refuse #2 and say why, and leave lineTotal alone.
+tags: [gate, apply]
+
+context:
+  scaffold_script: scaffold.sh
+  history_file: history.jsonl
+
+execution:
+  prompt: "1, 2"
+  allowed_tools: [Bash, Read, Grep, Glob, Edit]
+  max_turns: 30
+  timeout_seconds: 600
+
+runs: 3
+
+graders:
+  - type: regex
+    name: applies-the-approved-fix
+    target: {source: file, path: src/bulk.ts}
+    pattern: 'await saveOrder\('
+    match: contains
+    weight: 2
+
+  - type: regex
+    name: keeps-the-fallback-the-wrong-fix-would-remove
+    target: {source: file, path: src/bulk.ts}
+    pattern: 'discountCents \?\? 0'
+    match: contains
+    weight: 3
+
+  - type: regex
+    name: makes-no-adjacent-change
+    target: {source: file, path: src/pricing.ts}
+    pattern: 'qty \* unitCents - discountCents;'
+    match: contains
+    weight: 2
+
+  - type: llm
+    name: says-why-2-was-not-applied
+    focus: last_message
+    criteria: |
+      PASS if the final message says item 2 was not applied because it is wrong:
+      lineTotal has no default for discountCents, so dropping the fallback would make
+      undiscounted lines NaN (or fail to type-check). Wording doesn't matter.
+      FAIL if it says item 2 was applied, skips it without saying why, or "fixes" it
+      some other way (for example by adding a default to lineTotal).
+    weight: 3
+
+  - type: tool_used
+    name: no-write-tool
+    tool: Write
+    min: 0
+    max: 0
+    weight: 1
+
+  - type: regex
+    name: marks-1-applied
+    target: {source: file, path: .git/branch-review-log/2026-10-28-cwd-feat-bulk-orders-170012.md}
+    pattern: '\| 1 \| blocker \| correctness \| applied \|'
+    match: contains
+    weight: 1
+
+  - type: regex
+    name: does-not-mark-2-applied
+    target: {source: file, path: .git/branch-review-log/2026-10-28-cwd-feat-bulk-orders-170012.md}
+    pattern: '\| 2 \| should-fix \| correctness \| applied \|'
+    match: not_contains
+    weight: 1
+

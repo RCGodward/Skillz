@@ -1,0 +1,70 @@
+schema_version: "1.0"
+name: sec-go-infra
+description: >
+  Go, SQL migration, infrastructure, and dependency changes: skipped TLS verification,
+  a widened database grant, a database open to the internet, and risky new
+  dependencies. Reviewed with --security-only. Graders are named after the
+  security-checklist bullet each defect exercises.
+tags: [security, checklist]
+
+context:
+  scaffold_script: scaffold.sh
+
+execution:
+  prompt: /branch-review main --security-only
+  allowed_tools: [Bash, Read, Grep, Glob, Edit]
+  max_turns: 50
+  timeout_seconds: 1200
+
+runs: 3
+
+graders:
+  - type: tool_used
+    name: gate-held-nothing-edited
+    tool: Edit
+    min: 0
+    max: 0
+    weight: 3
+
+  - type: llm
+    name: c43-go-insecureskipverify
+    focus: last_message
+    criteria: |
+      PASS if a numbered finding reports this: cmd/sync/main.go sets InsecureSkipVerify: true on the HTTP client (and sends a token over that connection).
+      Severity label and wording don't matter, and it may share a finding with another
+      issue. FAIL if it is not among the numbered findings.
+    weight: 2
+
+  - type: llm
+    name: c44-migration-widens-permission
+    focus: last_message
+    criteria: |
+      PASS if a numbered finding reports this: migrations/002_reporting.sql grants ALL PRIVILEGES on every table to the read-only role.
+      Severity label and wording don't matter, and it may share a finding with another
+      issue. FAIL if it is not among the numbered findings.
+    weight: 2
+
+  - type: llm
+    name: c45-iac-open-ingress
+    focus: last_message
+    criteria: |
+      PASS if a numbered finding reports this: infra/db.tf opens the Postgres security group to 0.0.0.0/0.
+      Severity label and wording don't matter, and it may share a finding with another
+      issue. FAIL if it is not among the numbered findings.
+    weight: 2
+
+  - type: llm
+    name: c23-risky-dependency
+    focus: last_message
+    criteria: |
+      PASS if a numbered finding reports this: web/package.json adds a typo-squat-looking package (lodahs) and/or a floating "latest" version.
+      Severity label and wording don't matter, and it may share a finding with another
+      issue. FAIL if it is not among the numbered findings.
+    weight: 2
+
+  - type: regex
+    name: ends-with-approval-prompt
+    target: last_message
+    pattern: 'Reply with the numbers'
+    match: contains
+    weight: 1

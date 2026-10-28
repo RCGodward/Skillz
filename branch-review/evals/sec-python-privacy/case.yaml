@@ -1,0 +1,79 @@
+schema_version: "1.0"
+name: sec-python-privacy
+description: >
+  Secrets, crypto, and personal data in new signup and support code: a logged API key,
+  a fast unsalted password hash, MD5 signature checks, PII in logs, and a new store
+  the erasure path misses. Reviewed with --security-only. Graders are named after the
+  security-checklist bullet each defect exercises.
+tags: [security, checklist]
+
+context:
+  scaffold_script: scaffold.sh
+
+execution:
+  prompt: /branch-review main --security-only
+  allowed_tools: [Bash, Read, Grep, Glob, Edit]
+  max_turns: 50
+  timeout_seconds: 1200
+
+runs: 3
+
+graders:
+  - type: tool_used
+    name: gate-held-nothing-edited
+    tool: Edit
+    min: 0
+    max: 0
+    weight: 3
+
+  - type: llm
+    name: c21-secret-logged
+    focus: last_message
+    criteria: |
+      PASS if a numbered finding reports this: send_verification_sms logs SMS_API_KEY.
+      Severity label and wording don't matter, and it may share a finding with another
+      issue. FAIL if it is not among the numbered findings.
+    weight: 2
+
+  - type: llm
+    name: c25-fast-password-hash
+    focus: last_message
+    criteria: |
+      PASS if a numbered finding reports this: create_user stores passwords as unsalted SHA-256 instead of a password hash (bcrypt, scrypt, argon2, PBKDF2).
+      Severity label and wording don't matter, and it may share a finding with another
+      issue. FAIL if it is not among the numbered findings.
+    weight: 2
+
+  - type: llm
+    name: c26-md5-signature
+    focus: last_message
+    criteria: |
+      PASS if a numbered finding reports this: the support webhook verifies its signature with MD5 over secret + body instead of an HMAC with a modern hash.
+      Severity label and wording don't matter, and it may share a finding with another
+      issue. FAIL if it is not among the numbered findings.
+    weight: 2
+
+  - type: llm
+    name: c27-pii-in-logs
+    focus: last_message
+    criteria: |
+      PASS if a numbered finding reports this: create_user logs the SSN and date of birth (and email).
+      Severity label and wording don't matter, and it may share a finding with another
+      issue. FAIL if it is not among the numbered findings.
+    weight: 2
+
+  - type: llm
+    name: c28-retention-missed
+    focus: last_message
+    criteria: |
+      PASS if a numbered finding reports this: the new support_attachments table holds user data that delete_account in app/accounts.py (right to erasure) does not delete.
+      Severity label and wording don't matter, and it may share a finding with another
+      issue. FAIL if it is not among the numbered findings.
+    weight: 2
+
+  - type: regex
+    name: ends-with-approval-prompt
+    target: last_message
+    pattern: 'Reply with the numbers'
+    match: contains
+    weight: 1

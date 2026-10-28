@@ -1,0 +1,8 @@
+{
+  "branch": "feat/stats",
+  "args": "main",
+  "log_command": "export BRANCH_REVIEW_LOG_DIR=.git/branch-review-log; d=${BRANCH_REVIEW_LOG_DIR:-$HOME/.branch-review-log}; mkdir -p \"$d\"; f=\"$d/2026-10-28-cwd-feat-stats-170012.md\"; [ -e \"$f\" ] && echo exists || { cat > \"$f\" <<'EOF'\n---\ndate: 2026-10-28\nclient: Eval Fixture\nrepo: cwd\nbranch: feat/stats\nbase: main\nlanguage: typescript\nfiles_changed: 1\nlines_changed: 9\nskill_version: 0.6.0\nvariant: skill\ntool: claude-code\ngate_held: yes\nstyle_citations_ok:\n---\n\n<!-- disposition: applied | wrong | handled | preexisting | preference | not-worth-it | missed -->\n\n| # | severity | category | disposition | note |\n|---|---|---|---|---|\n| 1 | should-fix | correctness |  | mean of empty array returns NaN |\n| - |  |  | missed |  |\nEOF\necho \"$f\"; }",
+  "log_stdout": ".git/branch-review-log/2026-10-28-cwd-feat-stats-170012.md",
+  "final_text": "## Review of `feat/stats` against `main`\n\n### Should fix\n\n### 1. [Should fix] `mean([])` returns `NaN`\n`src/stats.ts:2`\nAn empty array divides `0` by `0`, and the `NaN` flows silently into later arithmetic; the return type gives callers no signal.\nFix: guard the empty case first, e.g. `if (xs.length === 0) throw new RangeError('mean of an empty array');`\n\n---\n**Reviewed** - base `main`, `main...HEAD` (1 commit), 1 file, 9 lines. Nothing deferred.\n**Looks good** - the functions are pure and `median` copies before sorting.\n\nReply with the numbers to apply (or 'all'), and I'll make just those changes.\n\nLog: `.git/branch-review-log/2026-10-28-cwd-feat-stats-170012.md` (from `BRANCH_REVIEW_LOG_DIR`)",
+  "log_file": "2026-10-28-cwd-feat-stats-170012.md"
+}

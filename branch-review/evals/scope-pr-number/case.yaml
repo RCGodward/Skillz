@@ -1,0 +1,59 @@
+schema_version: "1.0"
+name: scope-pr-number
+description: >
+  /branch-review 42 with the checkout on main. A stand-in gh serves PR #42 (a new
+  averageOrderValue that divides by zero on no orders). main also has an unrelated
+  commit the PR doesn't contain. The review must take PR #42's diff, not main's history
+  or the working tree.
+tags: [scope]
+
+context:
+  scaffold_script: scaffold.sh
+
+execution:
+  prompt: /branch-review 42
+  allowed_tools: [Bash, Read, Grep, Glob, Edit]
+  max_turns: 40
+  timeout_seconds: 900
+
+runs: 3
+
+graders:
+  - type: tool_used
+    name: gate-held-nothing-edited
+    tool: Edit
+    min: 0
+    max: 0
+    weight: 3
+
+  - type: tool_used
+    name: asks-gh-for-the-pr
+    tool: Bash
+    input_match: 'gh pr (diff|view|checkout) 42'
+    min: 1
+    weight: 2
+
+  - type: llm
+    name: reviews-the-pr-change
+    focus: last_message
+    criteria: |
+      PASS if a numbered finding reports that averageOrderValue in src/totals.ts divides
+      by totals.length and returns NaN for an empty array.
+      FAIL if that is not among the numbered findings.
+    weight: 3
+
+  - type: llm
+    name: does-not-review-mains-commit
+    focus: last_message
+    criteria: |
+      The CSV_MIME constant added to src/export.ts is on main, not in PR #42.
+      PASS if no numbered finding is about CSV_MIME or src/export.ts.
+      FAIL if one is.
+    weight: 2
+
+  - type: regex
+    name: ends-with-approval-prompt
+    target: last_message
+    pattern: 'Reply with the numbers'
+    match: contains
+    weight: 1

@@ -1,0 +1,60 @@
+schema_version: "1.0"
+name: apply-discovery
+description: >
+  Resumes a review that reported mean([]) returning NaN but missed that the branch's
+  median([]) right below it has the same flaw. The user approves #1. The review must
+  fix only mean, mention median, and log the miss as an [apply] row.
+tags: [apply, log]
+
+context:
+  scaffold_script: scaffold.sh
+  history_file: history.jsonl
+
+execution:
+  prompt: "1"
+  allowed_tools: [Bash, Read, Grep, Glob, Edit]
+  max_turns: 30
+  timeout_seconds: 600
+
+runs: 3
+
+graders:
+  - type: regex
+    name: guards-mean
+    target: {source: file, path: src/stats.ts}
+    pattern: 'export function mean\([^)]*\)[^{]*\{\s*if \('
+    match: contains
+    weight: 2
+
+  - type: regex
+    name: leaves-median-unchanged
+    target: {source: file, path: src/stats.ts}
+    pattern: 'export function median\([^)]*\)[^{]*\{\s*const sorted = \[\.\.\.xs\]'
+    match: contains
+    weight: 2
+
+  - type: llm
+    name: mentions-the-median-miss
+    focus: last_message
+    criteria: |
+      PASS if the final message says median has the same empty-input problem, that it
+      came in with this branch, and that it was left unchanged (offered as a separate
+      item rather than fixed). FAIL if median is not mentioned, or if it says median was
+      changed.
+    weight: 3
+
+  # The log itself, which the scaffold installed where the earlier turn wrote it.
+  - type: regex
+    name: logs-an-apply-miss
+    target: {source: file, path: .git/branch-review-log/2026-10-28-cwd-feat-stats-170012.md}
+    pattern: '\| - \| (blocker|should-fix|optional) \| correctness \| missed \| \[apply\][^|]*median'
+    flags: i
+    match: contains
+    weight: 3
+
+  - type: regex
+    name: marks-1-applied
+    target: {source: file, path: .git/branch-review-log/2026-10-28-cwd-feat-stats-170012.md}
+    pattern: '\| 1 \| should-fix \| correctness \| applied \|'
+    match: contains
+    weight: 1

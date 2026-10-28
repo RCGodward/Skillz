@@ -1,0 +1,96 @@
+schema_version: "1.0"
+name: sec-node-input
+description: >
+  Input handling in a new Express router: command execution, path traversal, SSRF,
+  open redirect, ReDoS, a missing outbound timeout, and prototype pollution. Reviewed with --security-only. Graders are named after the
+  security-checklist bullet each defect exercises.
+tags: [security, checklist]
+
+context:
+  scaffold_script: scaffold.sh
+
+execution:
+  prompt: /branch-review main --security-only
+  allowed_tools: [Bash, Read, Grep, Glob, Edit]
+  max_turns: 50
+  timeout_seconds: 1200
+
+runs: 3
+
+graders:
+  - type: tool_used
+    name: gate-held-nothing-edited
+    tool: Edit
+    min: 0
+    max: 0
+    weight: 3
+
+  - type: llm
+    name: c02-command-execution
+    focus: last_message
+    criteria: |
+      PASS if a numbered finding reports this: src/routes/media.ts builds a shell command from req.body.file and passes it to child_process.exec (command injection).
+      Severity label and wording don't matter, and it may share a finding with another
+      issue. FAIL if it is not among the numbered findings.
+    weight: 2
+
+  - type: llm
+    name: c03-path-traversal
+    focus: last_message
+    criteria: |
+      PASS if a numbered finding reports this: src/routes/media.ts joins req.params.name onto UPLOAD_DIR and sends the file, so ../ segments escape the upload directory (path traversal).
+      Severity label and wording don't matter, and it may share a finding with another
+      issue. FAIL if it is not among the numbered findings.
+    weight: 2
+
+  - type: llm
+    name: c08-ssrf
+    focus: last_message
+    criteria: |
+      PASS if a numbered finding reports this: src/routes/media.ts fetches req.query.url server-side and returns the body (SSRF).
+      Severity label and wording don't matter, and it may share a finding with another
+      issue. FAIL if it is not among the numbered findings.
+    weight: 2
+
+  - type: llm
+    name: c33-open-redirect
+    focus: last_message
+    criteria: |
+      PASS if a numbered finding reports this: src/routes/media.ts redirects to req.query.next without restricting it (open redirect).
+      Severity label and wording don't matter, and it may share a finding with another
+      issue. FAIL if it is not among the numbered findings.
+    weight: 2
+
+  - type: llm
+    name: c37-redos
+    focus: last_message
+    criteria: |
+      PASS if a numbered finding reports this: src/routes/media.ts compiles req.query.q into a RegExp, so a crafted pattern can cause catastrophic backtracking (ReDoS) or match unintended input.
+      Severity label and wording don't matter, and it may share a finding with another
+      issue. FAIL if it is not among the numbered findings.
+    weight: 2
+
+  - type: llm
+    name: c38-missing-timeout
+    focus: last_message
+    criteria: |
+      PASS if a numbered finding reports this: an outbound fetch in src/routes/media.ts (the partner licenses call, or the preview fetch) has no timeout, so a slow upstream ties up the request.
+      Severity label and wording don't matter, and it may share a finding with another
+      issue. FAIL if it is not among the numbered findings.
+    weight: 2
+
+  - type: llm
+    name: c40-prototype-pollution
+    focus: last_message
+    criteria: |
+      PASS if a numbered finding reports this: deepMerge in src/util/settings.ts merges user JSON without guarding __proto__ / constructor, so POST /prefs allows prototype pollution (the shared defaults object is also mutated).
+      Severity label and wording don't matter, and it may share a finding with another
+      issue. FAIL if it is not among the numbered findings.
+    weight: 2
+
+  - type: regex
+    name: ends-with-approval-prompt
+    target: last_message
+    pattern: 'Reply with the numbers'
+    match: contains
+    weight: 1

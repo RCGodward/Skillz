@@ -1,0 +1,78 @@
+schema_version: "1.0"
+name: sec-python-data
+description: >
+  Data handling in new Flask endpoints: pickle, unsafe YAML, template injection, NoSQL
+  operator injection, and CSV formula injection. Reviewed with --security-only. Graders are named after the
+  security-checklist bullet each defect exercises.
+tags: [security, checklist]
+
+context:
+  scaffold_script: scaffold.sh
+
+execution:
+  prompt: /branch-review main --security-only
+  allowed_tools: [Bash, Read, Grep, Glob, Edit]
+  max_turns: 50
+  timeout_seconds: 1200
+
+runs: 3
+
+graders:
+  - type: tool_used
+    name: gate-held-nothing-edited
+    tool: Edit
+    min: 0
+    max: 0
+    weight: 3
+
+  - type: llm
+    name: c04-unsafe-deserialization
+    focus: last_message
+    criteria: |
+      PASS if a numbered finding reports this: POST /imports/cart calls pickle.loads on the request body, allowing code execution.
+      Severity label and wording don't matter, and it may share a finding with another
+      issue. FAIL if it is not among the numbered findings.
+    weight: 2
+
+  - type: llm
+    name: c41-python-unsafe-yaml
+    focus: last_message
+    criteria: |
+      PASS if a numbered finding reports this: POST /imports/catalog uses yaml.load with yaml.Loader (not SafeLoader / safe_load) on request data.
+      Severity label and wording don't matter, and it may share a finding with another
+      issue. FAIL if it is not among the numbered findings.
+    weight: 2
+
+  - type: llm
+    name: c05-template-injection
+    focus: last_message
+    criteria: |
+      PASS if a numbered finding reports this: GET /greeting concatenates the name parameter into render_template_string (server-side template injection).
+      Severity label and wording don't matter, and it may share a finding with another
+      issue. FAIL if it is not among the numbered findings.
+    weight: 2
+
+  - type: llm
+    name: c06-nosql-injection
+    focus: last_message
+    criteria: |
+      PASS if a numbered finding reports this: POST /staff/login passes JSON body values straight into a Mongo query, so an operator such as {"$ne": ""} bypasses the password check.
+      Severity label and wording don't matter, and it may share a finding with another
+      issue. FAIL if it is not among the numbered findings.
+    weight: 2
+
+  - type: llm
+    name: c12-csv-injection
+    focus: last_message
+    criteria: |
+      PASS if a numbered finding reports this: the reviews CSV export writes user-entered comments without neutralizing leading = + - @ (CSV / formula injection).
+      Severity label and wording don't matter, and it may share a finding with another
+      issue. FAIL if it is not among the numbered findings.
+    weight: 2
+
+  - type: regex
+    name: ends-with-approval-prompt
+    target: last_message
+    pattern: 'Reply with the numbers'
+    match: contains
+    weight: 1

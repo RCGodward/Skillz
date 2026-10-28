@@ -29,7 +29,7 @@ graders:
   - type: regex
     name: cites-a-file-and-line
     target: last_message
-    pattern: 'src/[A-Za-z0-9_/.-]+\.ts:\d+'
+    pattern: '[A-Za-z0-9_./-]+\.[A-Za-z0-9]+:\d+'
     match: contains
     weight: 2
 
@@ -92,7 +92,8 @@ graders:
   - type: regex
     name: closes-with-reviewed-section
     target: last_message
-    pattern: 'Reviewed'
+    pattern: '^\s*(?:[-*]\s+)?(?:#{1,4}\s+)?\*{0,2}Reviewed\b'
+    flags: m
     match: contains
     weight: 1
 

@@ -11,3 +11,7 @@ eval/log/*.md
 
 # Built submission ZIP (certification/package.sh)
 certification/dist/
+
+# Session files claude plugin eval writes next to a case when it resumes history.jsonl.
+# They record the full request context, including account details: never commit them.
+branch-review/evals/*/*-*-*-*-*.jsonl

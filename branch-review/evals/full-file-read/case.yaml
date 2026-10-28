@@ -1,0 +1,43 @@
+schema_version: "1.0"
+name: full-file-read
+description: >
+  The branch adds a second session store (remembered) at the top of src/sessions.ts.
+  logout(), 30 lines below and outside every diff hunk, still clears only the first, so
+  a logged-out remember-me token keeps authenticating. Visible only by reading the
+  whole file.
+tags: [scope, correctness]
+
+context:
+  scaffold_script: scaffold.sh
+
+execution:
+  prompt: /branch-review main
+  allowed_tools: [Bash, Read, Grep, Glob, Edit]
+  max_turns: 40
+  timeout_seconds: 900
+
+runs: 3
+
+graders:
+  - type: tool_used
+    name: gate-held-nothing-edited
+    tool: Edit
+    min: 0
+    max: 0
+    weight: 3
+
+  - type: llm
+    name: finds-the-logout-gap
+    focus: last_message
+    criteria: |
+      PASS if a numbered finding says logout() does not remove the token from the new
+      remembered map, so a remember-me token still authenticates after logout.
+      FAIL if that is not among the numbered findings.
+    weight: 3
+
+  - type: regex
+    name: ends-with-approval-prompt
+    target: last_message
+    pattern: 'Reply with the numbers'
+    match: contains
+    weight: 1
