@@ -3,6 +3,16 @@
 Versions match `.claude-plugin/plugin.json`. A log entry's `skill_version` field says
 which one produced it.
 
+## 0.8.0 -- 2026-10-28
+
+- The 45-bullet security checklist is cut to the two checks it measurably added: a
+  timeout on every new outbound call, and session rotation on a privilege change. Bare
+  Sonnet found 39 of the 42 planted checklist defects, and the skill without the
+  checklist found 40, so the other bullets restated what the model does unprompted. The
+  trace rule (entry point, path, impact, fix) is unchanged. All 45 checklist graders stay
+  as regression tests and pass 3/3 on 0.8.0 (`certification/ITERATION-LOG.md`, iteration
+  10).
+
 ## 0.7.0 -- 2026-10-28
 
 Changes made after the Stage 3 review; `certification/ITERATION-LOG.md` (iterations 8-9)

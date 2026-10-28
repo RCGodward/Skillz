@@ -4,7 +4,7 @@ description: >
   Authentication and authorization in a new billing router: UI-only authorization,
   IDOR, a client-supplied role, session fixation, an unverified JWT, a weak reset
   token, a non-constant-time signature check, and a check-then-act race on a balance. Reviewed with --security-only. Graders are named after the
-  checklist bullet (SKILL.md, security pass) each defect exercises.
+  0.7.0 checklist bullet each defect exercises (see lib/security_cases.py).
 tags: [security, checklist]
 
 context:

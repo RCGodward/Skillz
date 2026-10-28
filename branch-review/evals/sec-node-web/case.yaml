@@ -4,7 +4,7 @@ description: >
   Rendering and web surface in a new profile router: reflected XSS, a user-controlled
   href, header injection, a missing auth check, CSRF, mass assignment, a missing rate
   limit, and stack traces in errors. Reviewed with --security-only. Graders are named after the
-  checklist bullet (SKILL.md, security pass) each defect exercises.
+  0.7.0 checklist bullet each defect exercises (see lib/security_cases.py).
 tags: [security, checklist]
 
 context:

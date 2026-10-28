@@ -73,7 +73,7 @@ copy the skill, delete one section, and run the same cases against both targets.
 | `security-only`, `style-only` | Each flag suppresses the other passes | Flags ignored |
 | `fix-flag` | `--fix` applies only Blocker/Should fix, runs the tests, ends on the full list, marks the log | Over-applying |
 | `apply-wrong-fix`, `apply-discovery` | Resumed sessions: refuses an approved-but-wrong fix; notices and logs a second instance of a fixed flaw | The apply step |
-| `sec-*` (7) | One planted defect per security-checklist bullet (graders `c02-...` to `c45-...`), reviewed with `--security-only` | `missed` security categories |
+| `sec-*` (7) | One planted defect per bullet of the 0.7.0 security checklist (graders `c02-...` to `c45-...`), reviewed with `--security-only`; since 0.8.0 cut the checklist, regression tests for the security pass | `missed` security categories |
 
 The original five cases also carry the gate, severity and Reviewed-section graders.
 `lib/security_cases.py` generates the `sec-*/case.yaml` files from one table; edit that,

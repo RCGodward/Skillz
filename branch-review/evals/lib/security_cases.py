@@ -1,12 +1,13 @@
-"""Writes the sec-*/case.yaml files: one grader per security-checklist bullet.
+"""Writes the sec-*/case.yaml files: one grader per bullet of the 0.7.0 security checklist.
 
 Usage: python3 lib/security_cases.py   (from branch-review/evals/)
 
 Each sec-* fixture plants several checklist defects in one branch and is reviewed with
---security-only. Every grader below is named after the checklist bullet it exercises
-(C01..C45, numbered in order of the checklist in SKILL.md's security pass), so TRACEABILITY.md can
-map bullets to graders one-to-one. C01, C16 and C20 are covered by security-trace,
-style-citation and scope-uncommitted.
+--security-only. Every grader below is named after the checklist bullet it exercised
+(C01..C45, in the order of the checklist in 0.7.0's security pass). 0.8.0 cut the
+checklist to the two checks it measurably added; these graders stay as regression tests
+for the security pass. C01, C16 and C20 are covered by security-trace, style-citation and
+scope-uncommitted.
 """
 import pathlib
 
@@ -89,7 +90,7 @@ HEADER = '''schema_version: "1.0"
 name: {name}
 description: >
   {description} Reviewed with --security-only. Graders are named after the
-  checklist bullet (SKILL.md, security pass) each defect exercises.
+  0.7.0 checklist bullet each defect exercises (see lib/security_cases.py).
 tags: [security, checklist]
 
 context:

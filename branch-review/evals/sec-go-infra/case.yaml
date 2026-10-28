@@ -4,7 +4,7 @@ description: >
   Go, SQL migration, infrastructure, and dependency changes: skipped TLS verification,
   a widened database grant, a database open to the internet, and risky new
   dependencies. Reviewed with --security-only. Graders are named after the
-  checklist bullet (SKILL.md, security pass) each defect exercises.
+  0.7.0 checklist bullet each defect exercises (see lib/security_cases.py).
 tags: [security, checklist]
 
 context:
