@@ -3,6 +3,22 @@
 Versions match `.claude-plugin/plugin.json`. A log entry's `skill_version` field says
 which one produced it.
 
+## 0.7.0 -- 2026-10-28
+
+Changes made after the Stage 3 review; `certification/ITERATION-LOG.md` (iterations 8-9)
+has the measurements.
+
+- The security checklist is inline in the security pass instead of
+  `references/security-checklist.md`. Runs opened the file unreliably, and the reviewer
+  counted its bullets as instructions anyway; every bullet now has a grader.
+- After each approved fix, check the branch's other new code for the same flaw.
+- Discoveries during apply: one question decides row vs comment -- did this branch add or
+  change the code? A second instance of a flaw in new code is a miss, logged `[apply]`.
+- House style: before calling a sibling pattern the convention, grep for it across the
+  changed file's directory.
+- Eval suite: 15 cases -> 27, including every checklist bullet, a PR number, a full-file
+  read, a test that asserts its mock, and two resumed-session cases for the apply step.
+
 ## 0.6.0 -- 2026-10-25
 
 Every change here came from an eval failure on Sonnet; `certification/ITERATION-LOG.md`

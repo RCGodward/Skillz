@@ -29,9 +29,10 @@ graders:
     name: reports-the-naming-divergence
     focus: last_message
     criteria: |
-      PASS if a numbered finding says the new file/class/method names (invoice_repo.ts,
-      InvoiceRepo, get_invoice) don't match the sibling repositories' conventions.
-      FAIL otherwise.
+      PASS if one or more numbered findings say the new names (invoice_repo.ts,
+      InvoiceRepo, get_invoice) don't match the sibling repositories' conventions. Split
+      across several findings (class, method, file) is fine.
+      FAIL if none does.
     weight: 2
 
 

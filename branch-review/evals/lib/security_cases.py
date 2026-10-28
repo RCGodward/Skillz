@@ -4,7 +4,7 @@ Usage: python3 lib/security_cases.py   (from branch-review/evals/)
 
 Each sec-* fixture plants several checklist defects in one branch and is reviewed with
 --security-only. Every grader below is named after the checklist bullet it exercises
-(C01..C45, numbered in order of references/security-checklist.md), so TRACEABILITY.md can
+(C01..C45, numbered in order of the checklist in SKILL.md's security pass), so TRACEABILITY.md can
 map bullets to graders one-to-one. C01, C16 and C20 are covered by security-trace,
 style-citation and scope-uncommitted.
 """
@@ -89,7 +89,7 @@ HEADER = '''schema_version: "1.0"
 name: {name}
 description: >
   {description} Reviewed with --security-only. Graders are named after the
-  security-checklist bullet each defect exercises.
+  checklist bullet (SKILL.md, security pass) each defect exercises.
 tags: [security, checklist]
 
 context:

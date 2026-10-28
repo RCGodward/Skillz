@@ -3,7 +3,7 @@ name: sec-python-data
 description: >
   Data handling in new Flask endpoints: pickle, unsafe YAML, template injection, NoSQL
   operator injection, and CSV formula injection. Reviewed with --security-only. Graders are named after the
-  security-checklist bullet each defect exercises.
+  checklist bullet (SKILL.md, security pass) each defect exercises.
 tags: [security, checklist]
 
 context:

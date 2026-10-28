@@ -10,7 +10,7 @@ allowed-tools:
   - Edit
 ---
 
-<!-- branch-review 0.6.0 -->
+<!-- branch-review 0.7.0 -->
 
 <objective>
 Review the changes on this branch against **the standards of the codebase they were added to**,
@@ -354,16 +354,14 @@ reason is the part worth recording.
 ### Discoveries during apply
 
 Applying a fix means reading the code far more closely than reviewing it did, so it is
-normal to find something the review pass missed. When that happens, add a row to the log
-in the same pass you mention it to the user.
+normal to find something the review pass missed. Mention it to the user, and record it in
+the log in the same pass. One question decides how:
 
-**Only if it was in scope for the review** -- introduced by this branch, or code the diff
-touched that the branch made worse. That is a genuine miss and the log should say so.
-
-An issue in code the branch never touched is **not** a miss. The review is instructed not
-to report pre-existing problems, so logging one as `missed` would penalise the skill for
-following its own rule and inflate the number you steer by. Mention it to the user, and
-record it as an HTML comment under the table rather than a row.
+**Did this branch add or change the code with the problem?**
+- **Yes** -> it's a miss: add an `[apply]` row (below). This includes a second instance of
+  the flaw you just fixed, in code the branch added.
+- **No** (the branch never touched it) -> not a miss, since the review is told not to report
+  pre-existing problems: record it as an HTML comment under the table, not a row.
 
 A qualifying row looks like:
 

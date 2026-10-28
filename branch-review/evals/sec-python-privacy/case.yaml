@@ -4,7 +4,7 @@ description: >
   Secrets, crypto, and personal data in new signup and support code: a logged API key,
   a fast unsalted password hash, MD5 signature checks, PII in logs, and a new store
   the erasure path misses. Reviewed with --security-only. Graders are named after the
-  security-checklist bullet each defect exercises.
+  checklist bullet (SKILL.md, security pass) each defect exercises.
 tags: [security, checklist]
 
 context:

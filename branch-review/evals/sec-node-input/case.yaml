@@ -3,7 +3,7 @@ name: sec-node-input
 description: >
   Input handling in a new Express router: command execution, path traversal, SSRF,
   open redirect, ReDoS, a missing outbound timeout, and prototype pollution. Reviewed with --security-only. Graders are named after the
-  security-checklist bullet each defect exercises.
+  checklist bullet (SKILL.md, security pass) each defect exercises.
 tags: [security, checklist]
 
 context:

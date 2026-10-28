@@ -3,7 +3,7 @@ name: sec-dotnet-java
 description: >
   C# and Java integrations: polymorphic JSON deserialization, disabled TLS validation,
   an unchecked upload into the web root, XXE, and Runtime.exec with a string. Reviewed with --security-only. Graders are named after the
-  security-checklist bullet each defect exercises.
+  checklist bullet (SKILL.md, security pass) each defect exercises.
 tags: [security, checklist]
 
 context:
