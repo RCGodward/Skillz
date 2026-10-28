@@ -1,0 +1,150 @@
+{
+  "scope-uncommitted/flags-the-committed-secret/run2": {
+    "label": "PASS",
+    "reason": "Finding 1 [Blocker] reports 'live-payments-key-7f3a9c2e41b84d6e' hardcoded as the apiKey fallback in src/config.ts:4."
+  },
+  "sec-dotnet-java/c07-xxe/run0": {
+    "label": "PASS",
+    "reason": "Finding 4 'XXE in feed import' says DocumentBuilderFactory.newInstance() defaults leave DTDs and external entities enabled."
+  },
+  "fix-flag/final-message-is-the-full-list/run0": {
+    "label": "PASS",
+    "reason": "Final message lists items 1 (marked [Applied]) and 2 (Optional comment), reports './test.sh prints PASS', and asks which numbers to apply."
+  },
+  "sec-node-input/c08-ssrf/run1": {
+    "label": "PASS",
+    "reason": "Finding 3 'SSRF with a reflected response body' covers GET /media/preview fetching query url and returning the body."
+  },
+  "sec-python-data/c12-csv-injection/run0": {
+    "label": "PASS",
+    "reason": "Finding 6 'CSV formula injection in the reviews export' says to prefix cells starting with =, +, -, @."
+  },
+  "style-only/reports-no-security-findings/run2": {
+    "label": "PASS",
+    "reason": "Finding 1 argues the missing tenantId mainly from the sibling repositories (orderRepository.ts:5-6, customerRepository.ts:5-6); the IDOR sentence is a passing impact note, with no traced entry point and no security label."
+  },
+  "sec-dotnet-java/c32-unsafe-upload/run2": {
+    "label": "PASS",
+    "reason": "Finding 3 'Path traversal and web-root write in upload' covers file.FileName into wwwroot/uploads; finding 7 covers missing size/type limits."
+  },
+  "sec-node-input/c03-path-traversal/run0": {
+    "label": "PASS",
+    "reason": "Finding 3 'Path traversal in file download' says path.join(UPLOAD_DIR, name) goes to sendFile and ../ escapes."
+  },
+  "apply-wrong-fix/says-why-2-was-not-applied/run2": {
+    "label": "FAIL",
+    "reason": "Says only '#2: I withdrew it because it was a wrong finding. The ?? 0 is needed, as explained above', with no statement that lineTotal lacks a default or that lines would become NaN."
+  },
+  "security-trace/reports-the-injection-as-a-blocker/run2": {
+    "label": "PASS",
+    "reason": "Finding 1 is labelled [Blocker] 'SQL injection through q' on GET /users in src/routes/users.ts."
+  },
+  "doc-block-match/proposes-a-matching-doc-block/run1": {
+    "label": "PASS",
+    "reason": "Finding 5 says getText has no doc block while the other exported functions have JSDoc with @param/@returns, and proposes 'a short block in the same shape'."
+  },
+  "security-trace/gives-the-trace/run2": {
+    "label": "PASS",
+    "reason": "Finding 1 gives the entry point (GET /users?q=), the path (interpolated into SQL passed to db.query), the impact (read any table) and the fix (ILIKE $1 with the value in the params array)."
+  },
+  "large-diff/says-what-it-deferred/run2": {
+    "label": "PASS",
+    "reason": "Reviewed section gives '+2533/-1' lines and says the six locale files were 'checked mechanically... I did not read the 420 entries in each file by hand'."
+  },
+  "doc-block-match/proposes-a-matching-doc-block/run0": {
+    "label": "PASS",
+    "reason": "Finding 3 says getText has no doc block while the other functions have @param and @returns, and proposes 'Add a matching block to getText'."
+  },
+  "style-only/reports-no-security-findings/run1": {
+    "label": "PASS",
+    "reason": "Finding 1 is argued from the sibling pattern and says 'This is also a tenant-isolation gap, but I didn't run the security pass', which is a passing mention."
+  },
+  "sec-python-privacy/c26-md5-signature/run0": {
+    "label": "PASS",
+    "reason": "Finding 6 'Webhook signature uses MD5 over secret + body' says it is not an HMAC and proposes hmac.new with sha256."
+  },
+  "scope-no-base/asks-for-the-base/run2": {
+    "label": "PASS",
+    "reason": "Says 'I couldn't find a base... I haven't reviewed anything yet', suggests release-2024 and asks which base to use."
+  },
+  "declared-rules/local-neighborhood-wins/run1": {
+    "label": "FAIL",
+    "reason": "No numbered finding is about the async/await vs .then() style; the only mention of reports.ts is in 'Looks good' ('The .catch form also matches reports.ts')."
+  },
+  "scope-uncommitted/covers-the-untracked-file/run0": {
+    "label": "PASS",
+    "reason": "Findings 2 and 3 are about src/paymentsClient.ts, and Reviewed names it as 'read in full'."
+  },
+  "large-diff/says-what-it-deferred/run0": {
+    "label": "PASS",
+    "reason": "Reviewed section gives '+2533/-1 lines' and says the six locale files were 'checked programmatically'."
+  },
+  "style-citation/style-findings-are-evidenced/run1": {
+    "label": "FAIL",
+    "reason": "Finding 4 'File and class naming' names CustomerRepository/OrderRepository classes and sibling files but gives no line numbers."
+  },
+  "doc-block-match/flags-the-stale-doc-block/run1": {
+    "label": "PASS",
+    "reason": "Finding 4 says getJson's doc block lacks timeoutMs and proposes '@param timeoutMs - Per-attempt timeout in milliseconds.'"
+  },
+  "doc-block-discipline/flags-the-restating-comment/run0": {
+    "label": "PASS",
+    "reason": "Finding 4 proposes deleting '// Loop through the lines and add them up' as restating the code; nothing proposes changing the orders.ts basis-points comment."
+  },
+  "security-only/reports-no-style-or-comment-findings/run2": {
+    "label": "FAIL",
+    "reason": "Finding 2 '[Optional] Comment restates the route' is about the '// get the user count' comment."
+  },
+  "declared-rules/code-beats-the-formatter-config/run1": {
+    "label": "PASS",
+    "reason": "No numbered finding asks to switch quotes; the quote mismatch appears only under 'Not changed' as 'not a finding'."
+  },
+  "sec-dotnet-java/c39-dotnet-typenamehandling/run2": {
+    "label": "PASS",
+    "reason": "Finding 1 says payload goes to JsonConvert.DeserializeObject with TypeNameHandling.All, so attacker $type picks the types."
+  },
+  "sec-python-privacy/c27-pii-in-logs/run0": {
+    "label": "PASS",
+    "reason": "Finding 2 'SSN and DOB written to logs in plaintext' (create_user) says the log exposes SSNs, DOBs and emails."
+  },
+  "sec-node-auth/c14-ui-only-authz/run0": {
+    "label": "PASS",
+    "reason": "Finding 3 'Project deletion is gated only in the UI' cites DELETE /api/projects/:id with requireAuth only and src/ui/projects.tsx:5."
+  },
+  "style-citation/style-findings-are-evidenced/run2": {
+    "label": "PASS",
+    "reason": "The style findings cite lines (orderRepository.ts:7-8, :4, :5, :6-10); finding 3 is only about the file name, which needs no line."
+  },
+  "sec-node-web/c34-error-leakage/run1": {
+    "label": "PASS",
+    "reason": "Finding 7 'Stack traces returned to clients' says err.stack is sent in an HTML <pre>."
+  },
+  "style-only/reports-the-naming-divergence/run0": {
+    "label": "PASS",
+    "reason": "Findings 3, 4 and 5 say InvoiceRepo, get_invoice and invoice_repo.ts don't match the sibling conventions."
+  },
+  "sec-node-auth/c19-jwt-unverified/run0": {
+    "label": "PASS",
+    "reason": "Finding 1 says GET /api/partner/statement uses jwt.decode with no signature check and trusts claims.partnerId."
+  },
+  "doc-block-discipline/flags-the-jsdoc-as-out-of-place/run2": {
+    "label": "PASS",
+    "reason": "Finding 3 says src/orders.ts, money.ts and lines.ts have no doc blocks ('0 of 3') and proposes 'Fix: remove it.'"
+  },
+  "scope-uncommitted/flags-the-committed-secret/run0": {
+    "label": "PASS",
+    "reason": "Finding 1 reports 'live-payments-key-7f3a9c2e41b84d6e' as the env fallback in src/config.ts:3."
+  },
+  "correctness-callers/flags-the-duplicate-helper/run0": {
+    "label": "PASS",
+    "reason": "Finding 4 says roundToCents duplicates roundCents in src/money.ts:1-3 and proposes importing it."
+  },
+  "apply-discovery/mentions-the-median-miss/run2": {
+    "label": "PASS",
+    "reason": "Says median has the same empty-array flaw 'in code this branch added', that it was left alone, and offers to add the guard."
+  },
+  "scope-pr-number/does-not-review-mains-commit/run2": {
+    "label": "PASS",
+    "reason": "The only numbered finding is about src/totals.ts empty input; src/export.ts appears only in passing as a comparison, and CSV_MIME is never flagged."
+  }
+}

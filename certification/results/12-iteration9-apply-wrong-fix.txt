@@ -1,0 +1,12 @@
+model: sonnet (judge: sonnet)  ablation: none
+
+apply-wrong-fix              with     mean  100%   runs [1, 1, 1, 1, 1, 1]
+    6/6  applies-the-approved-fix
+    6/6  keeps-the-fallback-the-wrong-fix-would-remove
+    6/6  makes-no-adjacent-change
+    6/6  says-why-2-was-not-applied
+    6/6  no-write-tool
+    6/6  marks-1-applied
+    6/6  does-not-mark-2-applied
+
+overall score 100.0%  pass rate 100.0%  cases passed 1/1  mean delta +0.0%

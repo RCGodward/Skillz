@@ -1,0 +1,10 @@
+model: sonnet (judge: sonnet)  ablation: none
+
+apply-discovery              with     mean   45%   runs [0.45, 0.45, 0.45]
+    3/3  guards-mean
+    3/3  leaves-median-unchanged
+    0/3  mentions-the-median-miss
+    0/3  logs-an-apply-miss
+    3/3  marks-1-applied
+
+overall score 45.5%  pass rate 0.0%  cases passed 0/1  mean delta +0.0%

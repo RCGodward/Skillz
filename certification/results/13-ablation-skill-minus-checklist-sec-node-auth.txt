@@ -1,0 +1,15 @@
+model: sonnet (judge: sonnet)  ablation: none
+
+sec-node-auth                with     mean   97%   runs [1, 1, 0.9]
+    3/3  gate-held-nothing-edited
+    3/3  c14-ui-only-authz
+    3/3  c15-idor
+    3/3  c17-client-supplied-role
+    2/3  c18-session-fixation
+    3/3  c19-jwt-unverified
+    3/3  c24-weak-random-token
+    3/3  c35-non-constant-time-compare
+    3/3  c36-toctou-balance
+    3/3  ends-with-approval-prompt
+
+overall score 96.7%  pass rate 66.7%  cases passed 0/1  mean delta +0.0%

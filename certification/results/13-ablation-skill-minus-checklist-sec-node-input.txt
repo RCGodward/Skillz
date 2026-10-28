@@ -1,0 +1,14 @@
+model: sonnet (judge: sonnet)  ablation: none
+
+sec-node-input               with     mean   89%   runs [0.89, 0.89, 0.89]
+    3/3  gate-held-nothing-edited
+    3/3  c02-command-execution
+    3/3  c03-path-traversal
+    3/3  c08-ssrf
+    3/3  c33-open-redirect
+    3/3  c37-redos
+    0/3  c38-missing-timeout
+    3/3  c40-prototype-pollution
+    3/3  ends-with-approval-prompt
+
+overall score 88.9%  pass rate 0.0%  cases passed 0/1  mean delta +0.0%

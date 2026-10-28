@@ -1,0 +1,6 @@
+items: 37  agreement: 34/37 (92%)
+judge FAIL, label PASS (false FAIL): 3
+judge PASS, label FAIL (false PASS): 0
+  style-only/reports-no-security-findings/run2: judge FAIL, label PASS -- Finding 1 argues the missing tenantId mainly from the sibling repositories (orderRepository.ts:5-6, customerRepository.ts:5-6); the IDOR sentence is a passing impact note, with no traced entry point and no security label.
+  large-diff/says-what-it-deferred/run0: judge FAIL, label PASS -- Reviewed section gives '+2533/-1 lines' and says the six locale files were 'checked programmatically'.
+  style-only/reports-the-naming-divergence/run0: judge FAIL, label PASS -- Findings 3, 4 and 5 say InvoiceRepo, get_invoice and invoice_repo.ts don't match the sibling conventions.

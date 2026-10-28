@@ -124,7 +124,7 @@ graders:
   - type: regex
     name: log-dispositions-left-blank
     target: trace
-    pattern: '\| 1 \| (blocker|should-fix|optional) \| (correctness|security|style|comments) \|  \|'
+    pattern: '\| 1 \| (blocker|should-fix|optional) \| (correctness|security|style|comments) \| *\|'
     match: contains
     weight: 1
 

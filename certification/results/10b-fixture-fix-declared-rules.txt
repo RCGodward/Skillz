@@ -1,0 +1,11 @@
+model: sonnet (judge: sonnet)  ablation: none
+
+declared-rules               with     mean   81%   runs [0.83, 0.58, 1]
+    3/3  gate-held-nothing-edited
+    2/3  applies-the-declared-logging-rule
+    3/3  code-beats-the-formatter-config
+    3/3  mentions-the-config-disagreement
+    1/3  local-neighborhood-wins
+    3/3  ends-with-approval-prompt
+
+overall score 80.6%  pass rate 33.3%  cases passed 0/1  mean delta +0.0%
