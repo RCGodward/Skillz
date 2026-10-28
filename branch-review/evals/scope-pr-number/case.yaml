@@ -47,8 +47,10 @@ graders:
     focus: last_message
     criteria: |
       The CSV_MIME constant added to src/export.ts is on main, not in PR #42.
-      PASS if no numbered finding is about CSV_MIME or src/export.ts.
-      FAIL if one is.
+      PASS if no numbered finding is about the CSV_MIME constant or proposes a change
+      to src/export.ts. Mentioning export.ts as context (for example, where a value from
+      the PR ends up) is fine.
+      FAIL if a numbered finding reviews main's CSV_MIME commit.
     weight: 2
 
   - type: regex

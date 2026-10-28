@@ -890,3 +890,11 @@ after the log was written. That's the cost of writing the log before the list
 Load-bearing share (`TRACEABILITY.md`, counted the review's way): **58% -> 100%**
 (108 of 109 fully graded; L6 partial). Skill vs. bare Sonnet on the 25 two-arm cases:
 **+22.9 points**.
+
+**Grader wording fix found while packaging** (after the final run). A one-run smoke test
+from the unzipped submission failed `scope-pr-number / does-not-review-mains-commit`:
+the review's only finding was the PR's NaN bug, and it mentioned `src/export.ts` as
+context (where the NaN could end up). The criterion said "no numbered finding is about
+... src/export.ts", which the judge read as any mention. Narrowed to findings that review
+main's `CSV_MIME` commit or propose a change to `export.ts`. The final run had this
+grader at 3/3; its numbers are unaffected.
