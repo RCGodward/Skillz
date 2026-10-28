@@ -14,7 +14,7 @@ import re
 import sys
 
 SEVERITY = {"Blocker": "blocker", "Should fix": "should-fix", "Optional": "optional"}
-ROW = re.compile(r"^\| (\d+) \| ([a-z-]+) \| [a-z]+ \|", re.M)
+ROW = re.compile(r"^\| (\d+) \| ([a-z-]+) \| [a-z/]+ \|", re.M)
 FINDING = re.compile(r"^(?:#{2,4}\s*|\*\*)(\d+)\.\s*\[([^\]]+)\]", re.M)
 
 

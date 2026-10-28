@@ -737,7 +737,8 @@ deletes only the checklist (`results/13-ablation-skill-minus-checklist-*.txt`): 
 still 3/3, misses C38 (0/3) and C18 (2/3). So on these fixtures the checklist's own
 measurable contribution is two bullets. The fixtures plant clear-cut, textbook
 instances, which Sonnet recognizes unprompted; they cannot show the checklist's value on
-subtler real-world variants. Kept at the author's decision, with this recorded.
+subtler real-world variants. Kept at the author's decision at this point, with this recorded; iteration 10 revisits
+it.
 
 ## Fixture fixes, measured on the unchanged prompt
 
@@ -818,9 +819,9 @@ All three disagreements were ones the labeller itself called ambiguous, or the g
 wording fixed in iteration 9. The judge errs strict: where it's wrong it fails good
 output, so reported scores are if anything understated.
 
-## Final run -- 0.7.0, the resubmitted prompt
+## Final run -- 0.7.0
 
-**Skill:** 0.7.0, exactly as submitted (commit `dce0798`) - **Suite:** 27 cases x 3 runs,
+**Skill:** 0.7.0 (commit `dce0798`) - **Suite:** 27 cases x 3 runs,
 both arms where possible - Sonnet as model and judge - 0 API errors - cost $54.01 -
 `results/20-final-0.7.0.txt`
 
@@ -898,3 +899,100 @@ context (where the NaN could end up). The criterion said "no numbered finding is
 ... src/export.ts", which the judge read as any mention. Narrowed to findings that review
 main's `CSV_MIME` commit or propose a change to `export.ts`. The final run had this
 grader at 3/3; its numbers are unaffected.
+
+## Iteration 10 -- Refactor: cut the checklist to what it measurably adds
+
+**Red, from data already measured:** the checklist ablation above. 45 bullets, every one
+graded, but on these fixtures bare Sonnet found 39 of the 42 planted defects 3/3 and the
+skill minus its checklist found 40. A grader per bullet shows the bullet is *covered*,
+not that it changes anything; by that stronger test, 43 of the 45 were dead weight, and
+they were a quarter of the prompt.
+
+**Hypothesis:** the trace rule and the rest of the skill carry the security pass. Only
+the two defects the checklist-less skill missed -- C38 (outbound timeout, 0/3) and C18
+(session fixation, 2/3) -- need an instruction, and they are worth more stated as checks
+to make, with the reason, than as two lines among 45.
+
+**Change (0.7.0 -> 0.8.0):** delete the eight category headings, the 45 bullets, and their
+lead-in (P2). Add: *"Two checks are easy to skip when nothing looks wrong, so make them
+explicitly"* -- every new outbound call sets a timeout; a session or token is regenerated
+on a privilege change. The trace rule (P2b, P2c) is unchanged. SKILL.md: 380 -> 304
+lines. All 45 checklist graders stay, as regression tests.
+
+**Result:** the full suite, both arms, as the final run below. Every one of the 45
+checklist graders is **3/3**, including C38 (2/3 on 0.7.0, as a bullet) and C18; the
+three that bare Sonnet misses (C28, C31, C38) are 0/3, 0/3 and 1/3 in the without arm of
+the same run. Overall 99.6% against 0.7.0's 99.1%; two non-security graders dropped to
+2/3 for one run each, neither related to the cut (below).
+**Kept.** Instruction count 109 -> 65, all graded (`TRACEABILITY.md`).
+
+**Checker fix (labelled):** `tools/check_log_rows.py` read a log row's category as
+`[a-z]+`, so a row categorized `style/security` looked missing. It now accepts `/`.
+
+## Final run -- 0.8.0, the resubmitted prompt
+
+**Skill:** 0.8.0, exactly as submitted (commit `5ef2197`) - **Suite:** 27 cases x 3
+runs, both arms where possible - Sonnet as model and judge - 0 API errors - cost $32.61 -
+`results/21-final-0.8.0.txt`
+
+| Case | With skill | Without skill |
+|---|---|---|
+| apply-discovery | 91% | -- |
+| apply-wrong-fix | 100% | -- |
+| correctness-callers | 97% | 74% |
+| declared-rules | 100% | 59% |
+| doc-block-discipline | 100% | 61% |
+| doc-block-match | 100% | 70% |
+| fix-flag | 100% | 64% |
+| full-file-read | 100% | 72% |
+| large-diff | 100% | 41% |
+| no-preexisting-noise | 100% | 81% |
+| scope-auto-base | 100% | 70% |
+| scope-no-base | 100% | 67% |
+| scope-path | 100% | 90% |
+| scope-pr-number | 100% | 73% |
+| scope-uncommitted | 100% | 58% |
+| sec-dotnet-java | 100% | 93% |
+| sec-go-infra | 100% | 92% |
+| sec-node-auth | 100% | 95% |
+| sec-node-input | 100% | 87% |
+| sec-node-web | 100% | 85% |
+| sec-python-data | 100% | 93% |
+| sec-python-privacy | 100% | 79% |
+| security-only | 100% | 70% |
+| security-trace | 100% | 70% |
+| style-citation | 100% | 51% |
+| style-only | 100% | 89% |
+| test-asserts-mock | 100% | 86% |
+| **All 27 cases** | **99.6%** | -- |
+| **The 25 cases with both arms** | **99.9%** | **74.7%** |
+
+25 of 27 cases at 100%. The two failing graders, both single runs:
+
+| Grader | Result | Read |
+|---|---|---|
+| `apply-discovery / mentions-the-median-miss` | 2/3 | The run reported median's identical flaw and left it unchanged, but didn't say it came in with this branch, which the criterion requires (it did log it as an `[apply]` miss) |
+| `correctness-callers / groups-and-numbers-findings` | 2/3 | **Judge false FAIL** (votes FAIL PASS FAIL): the review is grouped Blocker / Should fix, numbered 1-4 continuously, each with `file:line` and a fix. Left as measured |
+
+The four graders below 3/3 on 0.7.0 (local-neighborhood-wins, C38, the
+`--security-only` comment finding, one citation) are all 3/3 here. With 3 runs per case,
+treat that as "no regression", not as proof the cut fixed them.
+
+Log rows vs. findings (L6, `results/21-log-rows-check-0.8.0.txt`): **70 of 71 match** at
+first write. The mismatch (`full-file-read` run 2) wrote finding 3 as should-fix, then
+rewrote the log's rows to match the list (3 optional) before presenting it; the checker
+reads the first write.
+
+## Summary after iteration 10
+
+| Step | Change | With skill | What moved |
+|---|---|---|---|
+| Red (0.6.0) | 45 checklist graders, S2/S7/P1c, G4/L10 via resumed sessions | 95.6% (27 cases) | all `sec-*` 100%; L10 0/3 |
+| 8 | Checklist inline; look again after a fix; grep the directory | 97.4% | median mentioned 0/3 -> 3/3 |
+| 9 | One question for apply-time discoveries; 0.7.0 | (apply cases) 94-100% | `[apply]` row 1/3 -> 5/6 |
+| Final 0.7.0 | -- | 99.1% | 23/27 cases at 100% |
+| 10 | Checklist cut to two checks; 0.8.0 | **99.6%** | 109 -> 65 instructions; 45/45 security graders 3/3 |
+
+Load-bearing share (`TRACEABILITY.md`, counted the review's way): **58% -> 100%** (64 of
+65 fully graded; L6 partial), and the checklist -- the one block an ablation showed the
+model mostly didn't need -- is gone. Skill vs. bare Sonnet on the 25 two-arm cases: **+25.2 points**.

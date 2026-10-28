@@ -1,34 +1,40 @@
 # Instruction -> criterion traceability
 
-Every instruction in `branch-review/SKILL.md` **0.7.0** (the resubmitted prompt),
-including the 45 security-checklist bullets now inline in its security pass, and the eval
-grader that fails if the instruction is ignored. Graders are named `case / grader` and
+Every instruction in `branch-review/SKILL.md` **0.8.0** (the resubmitted prompt), and the
+eval grader that fails if the instruction is ignored. Graders are named `case / grader` and
 live in `branch-review/evals/<case>/case.yaml`.
 
 An instruction is **load-bearing** when at least one grader fails without it. Counted the
-way the Stage 3 review counted: the SKILL.md units below plus every checklist bullet.
+way the Stage 3 review counted: every SKILL.md unit, and every checklist bullet while
+there was a checklist.
 
 Status: **graded**; **partial** -- graded, but part of the instruction isn't.
 
 ## Summary
 
-| | 0.5.0 (start) | 0.6.0 (as reviewed) | **0.7.0 (resubmitted)** |
-|---|---|---|---|
-| SKILL.md instructions | 66 | 62 | 64 |
-| Checklist bullets the prompt makes the model use | 45 | 45 | 45 (inline) |
-| **Total** | 111 | 107 | **109** |
-| Graded | 14 (13 + C16) | 59 (56 + 3 checklist) | **108** |
-| Partial | 10 | 3 | **1** (L6) |
-| No criterion | 87 | 45 (3 + 42 checklist) | **0** |
-| **Load-bearing** | 22% | 58% (review's figure) | **100%** (99% fully graded) |
+| | 0.5.0 (start) | 0.6.0 (as reviewed) | 0.7.0 | **0.8.0 (resubmitted)** |
+|---|---|---|---|---|
+| SKILL.md instructions | 66 | 62 | 64 | **65** |
+| Checklist bullets the prompt makes the model use | 45 | 45 | 45 (inline) | **0** (cut to P2d, P2e) |
+| **Total** | 111 | 107 | 109 | **65** |
+| Graded | 14 (13 + C16) | 59 (56 + 3 checklist) | 108 | **64** |
+| Partial | 10 | 3 | 1 (L6) | **1** (L6) |
+| No criterion | 87 | 45 (3 + 42 checklist) | 0 | **0** |
+| **Load-bearing** | 22% | 58% (review's figure) | 100% | **100%** (98% fully graded) |
 
-Counted mechanically from the tables below. 0.7.0 has two more SKILL.md instructions than
-0.6.0 (H8b, G7, added in iteration 8) and none of 0.6.0's three exceptions: S2, G4 and
-L10 now have criteria.
+Counted mechanically from the tables below. 0.7.0 added H8b and G7 (iteration 8) and gave
+0.6.0's three exceptions (S2, G4, L10) criteria. 0.8.0 (iteration 10) replaced the
+checklist and its lead-in (P2) with two checks, P2d and P2e, the only bullets an ablation
+showed the model needed.
 
 Graded is not the same as reliably followed: "Graded but unstable" below lists the
-instructions that pass only part of the time, and the iteration log reports what the
-checklist bullets add over bare Sonnet (most planted defects are found without them).
+instructions that pass only part of the time.
+
+**Sensitivity, not just coverage.** For the cut, "has a grader" wasn't the test: the
+checklist had one grader per bullet and still mostly restated what Sonnet does unprompted.
+Two ablations measured it (iteration log, "Red step for iterations 8-9"): bare Sonnet found
+39 of 42 planted defects, the skill minus its checklist 40. The two it missed became P2d
+and P2e.
 
 ## Objective
 
@@ -74,9 +80,10 @@ checklist bullets add over bare Sonnet (most planted defects are found without t
 | P1 | Correctness: boundaries, nulls, async, contracts... | graded | `correctness-callers / flags-the-unawaited-save`; `scope-path / finds-the-billing-bug`; `scope-auto-base / finds-the-bug-in-the-first-commit`; `large-diff / catches-the-inverted-expiry` |
 | P1b | Grep for other callers of a changed shared function | graded | `correctness-callers / flags-the-unupdated-caller` (caller is in an untouched file) |
 | P1c | Tests that assert the mock, or were skipped | graded | `correctness-callers / flags-the-skipped-test` (skipped); `test-asserts-mock / flags-the-test-asserting-its-mock` (asserts the mock) |
-| P2 | Work through the categories that match the diff, even when it looks safe | graded | The 45 checklist rows below: each category is graded on whether a planted defect of that kind is reported |
 | P2b | Security finding states entry point, path, impact, fix | graded | `security-trace / gives-the-trace` (iteration 5) |
 | P2c | Report only what you can trace end to end; "could be unsafe" is noise | graded | `security-trace / does-not-flag-the-allowlisted-sort` |
+| P2d | Every new outbound call sets a timeout | graded | `sec-node-input / c38-missing-timeout` (0/3 without the checklist, 3/3 on 0.8.0) |
+| P2e | Regenerate the session or token on a privilege change | graded | `sec-node-auth / c18-session-fixation` (2/3 without the checklist, 3/3 on 0.8.0) |
 | P3 | Style conformance against evidenced conventions | graded | `style-citation / style-findings-are-evidenced`; `declared-rules / local-neighborhood-wins` |
 | P3b | Hand-rolled helper duplicating an existing one | graded | `correctness-callers / flags-the-duplicate-helper` |
 | P3c | Not findings: preferences, idiom upgrades, untouched lines | graded | `no-preexisting-noise / keeps-the-list-short`; `declared-rules / code-beats-the-formatter-config` |
@@ -134,12 +141,14 @@ checklist bullets add over bare Sonnet (most planted defects are found without t
 | L9 | After apply, set `applied` on approved rows only | graded | `fix-flag / marks-applied-in-the-log`, `leaves-optional-row-blank-in-the-log` |
 | L10 | Discoveries during apply: one question (did the branch add or change the code?) decides `[apply]` row vs comment | graded | `apply-discovery / logs-an-apply-miss` (iteration 9) |
 
-## Security checklist (SKILL.md, security pass)
+## Security regression tests (the 0.7.0 checklist)
 
-Inline in SKILL.md since 0.7.0, numbered in order. Each bullet has a planted defect and a
-grader that passes only if the review reports it; C01, C16 and C20 reuse earlier cases.
+Not instructions in 0.8.0: these are the bullets of the checklist that iteration 10 cut,
+kept because each still has a planted defect and a grader that passes only if the review
+reports it. On 0.8.0 all 45 pass 3/3 (`results/21-final-0.8.0.txt`), so cutting the
+checklist lost none of them. C01, C16 and C20 reuse earlier cases.
 
-| ID | Bullet | St. | Grader(s) |
+| ID | 0.7.0 bullet | St. | Grader(s) |
 |---|---|---|---|
 | C01 | SQL / ORM raw fragments built with string concatenation or interpolation.... | graded | `security-trace / reports-the-injection-as-a-blocker`, `gives-the-trace`, `does-not-flag-the-allowlisted-sort` |
 | C02 | Command execution built from input (`exec`, `spawn` with shell, `Process.Start`,... | graded | `sec-node-input / c02-command-execution` |
@@ -190,20 +199,18 @@ grader that passes only if the review reports it; C01, C16 and C20 reuse earlier
 ## Graded but unstable on Sonnet
 
 Graded means a grader fails when the instruction is ignored -- not that it always passes.
-In the final 0.7.0 run (`results/20-final-0.7.0.txt`) every instruction's graders pass in
-at least 2 of 3 runs; these are the ones below 3/3, or historically unreliable:
+In the final 0.8.0 run (`results/21-final-0.8.0.txt`) every instruction's graders pass in
+at least 2 of 3 runs; these are the ones below 3/3 there, or in the 0.7.0 run before it:
 
-| ID | Final run | History | What the outcome shows |
+| ID | 0.8.0 | 0.7.0 | What the outcome shows |
 |---|---|---|---|
-| H8 / H8b name both sides of an inconsistency | 2/3 | ~50% in iterations 3-7, 2/3 since the directory grep (iteration 8) | The local style is always applied; what's sometimes missing is naming the odd file out |
-| P0 honor `--security-only` | 2/3 | 3/3 in the red step | One run added an Optional comment finding |
-| H6/H7 cite `file:line` for every style finding | 2/3 | 3/3 in most runs | One naming finding without a line number |
-| L6 log rows match the list | 71/72 runs | -- | One finding dropped after the log was written |
-| C38 outbound timeouts | 2/3 | 3/3 in the red step | The bullet the ablation shows the checklist is actually needed for |
-
-The two process instructions the review flagged as unreliable -- reading the checklist
-(P2) and not reading it under `--style-only` (P0) -- no longer exist: the checklist is
-inline (iteration 8).
+| G7 look again after a fix | 2/3 | 3/3 | The second instance was reported and left alone in every run; one didn't say it came in with this branch |
+| U1 grouped and numbered | 2/3 | 3/3 | **Judge false FAIL** (votes FAIL PASS FAIL): the review is grouped, numbered 1-4, every finding has a location and fix |
+| H8 / H8b name both sides of an inconsistency | 3/3 | 2/3 | ~50% in iterations 3-7; 2/3 or 3/3 since the directory grep (iteration 8) |
+| P0 honor `--security-only` | 3/3 | 2/3 | One 0.7.0 run added an Optional comment finding |
+| H6/H7 cite `file:line` for every style finding | 3/3 | 2/3 | One 0.7.0 naming finding without a line number |
+| L6 log rows match the list | 70/71 at first write | 71/72 | The 0.8.0 mismatch was rewritten to match before the list was shown |
+| P2d outbound timeouts | 3/3 | 2/3 (as a checklist bullet) | Stated as its own check in 0.8.0 |
 
 ## Exceptions
 
@@ -224,6 +231,14 @@ test (`branch-review/evals/lib/make_history.py`).
 | `<notes>`: non-git directories | Model default; untestable and unneeded. |
 | Checklist preamble: reporting rule | Moved into SKILL.md (P2b) in iteration 5; the checklist now defers to it. |
 
-`references/security-checklist.md` itself is a catalog the security pass consults, not
-a list of instructions: grading each of its ~60 categories would need ~60 fixtures. Its
-use is graded (P2), and so is the reporting rule (P2b) and the trace-only rule (P2c).
+(At 0.6.0 the checklist lived in `references/security-checklist.md` and was treated as a
+catalog, not instructions; the review counted its bullets anyway, which is why 0.7.0
+graded every one.)
+
+## Cut in iteration 10
+
+| Was | Why cut |
+|---|---|
+| P2: "Work through the categories below... even when it looks safe" | Lead-in to the checklist; nothing left to work through |
+| 43 checklist bullets (all but C18, C38) | Ablation: the skill without the checklist found all 40 of their `sec-*` defects 3/3 (C01, C16, C20 sit in other cases). All 45 graders pass 3/3 on 0.8.0 |
+| C18, C38 as bullets | Rewritten as P2d, P2e: stated as checks to make, with the reason, instead of catalog entries |
