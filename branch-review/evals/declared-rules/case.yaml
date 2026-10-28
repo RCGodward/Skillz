@@ -2,8 +2,8 @@ schema_version: "1.0"
 name: declared-rules
 description: >
   CONTRIBUTING.md declares a logging rule the new file breaks. .prettierrc says single
-  quotes, but every file uses double quotes, and so does the new one. src/api uses
-  async/await and src/legacy uses .then(); the new file lands in src/api using .then().
+  quotes, but every file uses double quotes, and so does the new one. src/api mostly
+  uses async/await, but its oldest file uses .then(); the new file uses .then().
 tags: [house-style]
 
 context:
@@ -58,11 +58,12 @@ graders:
     name: local-neighborhood-wins
     focus: last_message
     criteria: |
-      PASS if a numbered finding says refunds.ts should use async/await with
-      try/catch like its src/api siblings (orders.ts / customers.ts), and the review
-      acknowledges that src/legacy uses .then() -- that is, it names the split rather
-      than treating .then() as wrong everywhere.
-      FAIL if the async-style finding is missing, or it doesn't acknowledge src/legacy.
+      src/api is internally inconsistent: orders.ts and customers.ts use async/await
+      with try/catch; the older reports.ts uses .then().
+      PASS if a numbered finding says refunds.ts should follow the async/await pattern
+      of orders.ts / customers.ts AND acknowledges that reports.ts uses .then() (names
+      the split rather than presenting async/await as the only style in the directory).
+      FAIL if the async-style finding is missing or doesn't acknowledge reports.ts.
     weight: 2
 
   - type: regex

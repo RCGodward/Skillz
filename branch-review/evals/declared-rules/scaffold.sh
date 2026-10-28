@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../lib/fixture.sh"
-mkdir -p src/api src/legacy
+mkdir -p src/api
 cat > CONTRIBUTING.md <<'MD'
 # Contributing
 
@@ -38,7 +38,8 @@ export async function getCustomer(id: string) {
   }
 }
 TS
-cat > src/legacy/reports.ts <<'TS'
+# The oldest module in src/api predates the switch to async/await.
+cat > src/api/reports.ts <<'TS'
 import {db} from "../db";
 
 export function getReport(id: string) {

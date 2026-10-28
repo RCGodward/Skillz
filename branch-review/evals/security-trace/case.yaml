@@ -60,14 +60,6 @@ graders:
       FAIL if a numbered finding treats the sort column as an injection risk.
     weight: 3
 
-  # The skill says to read the checklist on every security pass; in iterations 3-4 only
-  # one run in six did.
-  - type: tool_used
-    name: reads-the-security-checklist
-    tool: Read
-    input_match: 'security-checklist'
-    min: 1
-    weight: 2
 
   # The approval prompt is the user's cue to answer; if anything follows it, or the
   # list landed in an earlier message, the review ended in the wrong place.

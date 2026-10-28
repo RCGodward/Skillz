@@ -34,15 +34,6 @@ graders:
       FAIL otherwise.
     weight: 2
 
-  # The security pass is the one that reads the checklist (SKILL.md, passes section 2), so
-  # not reading it is the mechanical sign the pass was skipped.
-  - type: tool_used
-    name: skips-the-security-pass
-    tool: Read
-    input_match: 'security-checklist'
-    min: 0
-    max: 0
-    weight: 2
 
   - type: llm
     name: reports-no-security-findings

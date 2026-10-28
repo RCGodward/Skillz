@@ -46,7 +46,7 @@ graders:
   # The log itself, which the scaffold installed where the earlier turn wrote it.
   - type: regex
     name: logs-an-apply-miss
-    target: {source: file, path: .git/branch-review-log/2026-10-28-cwd-feat-stats-170012.md}
+    target: {source: file, path: .review-logs/2026-10-28-cwd-feat-stats-170012.md}
     pattern: '\| - \| (blocker|should-fix|optional) \| correctness \| missed \| \[apply\][^|]*median'
     flags: i
     match: contains
@@ -54,7 +54,7 @@ graders:
 
   - type: regex
     name: marks-1-applied
-    target: {source: file, path: .git/branch-review-log/2026-10-28-cwd-feat-stats-170012.md}
+    target: {source: file, path: .review-logs/2026-10-28-cwd-feat-stats-170012.md}
     pattern: '\| 1 \| should-fix \| correctness \| applied \|'
     match: contains
     weight: 1

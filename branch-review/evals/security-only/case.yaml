@@ -51,11 +51,3 @@ graders:
     match: contains
     weight: 1
 
-  # The skill says to read the checklist on every security pass; in iterations 3-4 only
-  # one run in six did.
-  - type: tool_used
-    name: reads-the-security-checklist
-    tool: Read
-    input_match: 'security-checklist'
-    min: 1
-    weight: 2

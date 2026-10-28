@@ -61,14 +61,14 @@ graders:
 
   - type: regex
     name: marks-1-applied
-    target: {source: file, path: .git/branch-review-log/2026-10-28-cwd-feat-bulk-orders-170012.md}
+    target: {source: file, path: .review-logs/2026-10-28-cwd-feat-bulk-orders-170012.md}
     pattern: '\| 1 \| blocker \| correctness \| applied \|'
     match: contains
     weight: 1
 
   - type: regex
     name: does-not-mark-2-applied
-    target: {source: file, path: .git/branch-review-log/2026-10-28-cwd-feat-bulk-orders-170012.md}
+    target: {source: file, path: .review-logs/2026-10-28-cwd-feat-bulk-orders-170012.md}
     pattern: '\| 2 \| should-fix \| correctness \| applied \|'
     match: not_contains
     weight: 1
