@@ -878,7 +878,7 @@ Log rows vs. findings (L6), over every run with a log and a list
 after the log was written. That's the cost of writing the log before the list
 (iteration 2), seen once in 72 runs.
 
-## Summary after the review
+## Summary after iteration 9
 
 | Step | Change | With skill | What moved |
 |---|---|---|---|
